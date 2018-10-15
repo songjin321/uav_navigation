@@ -1,1 +1,2 @@
-## UAV navigation with improved maplab
+## Huang Shixiong's paper experiment code
+## Include UAV stereo dense mapping and path planning

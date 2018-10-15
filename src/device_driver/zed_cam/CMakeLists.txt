@@ -13,7 +13,7 @@ catkin_package(
         INCLUDE_DIRS 
         LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS cv_bridge image_transport roscpp sensor_msgs std_msgs
-        DEPENDS system_lib
+        DEPENDS 
 )
 
 include_directories(
