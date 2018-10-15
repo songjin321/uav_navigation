@@ -1,0 +1,10 @@
+<launch>
+    <node name="uav_controller_server" pkg="uav_controller" type="uav_controller_server" output="screen"/>
+    <node name="planner_server" pkg="simple_line_planner" type="line_planner_server" output="screen">
+    </node>
+    <include file="$(find vrpn_client_ros)/launch/sample.launch">
+        <remap from="/vrpn_client_node/three/pose" to="/mavros/vision_pose/pose"/>
+        <arg name="server" value="192.168.1.105"/>
+    </include>
+    <node name="test_uav_controller" pkg="uav_controller" type="test_uav_controller" output="screen"/>
+</launch>
