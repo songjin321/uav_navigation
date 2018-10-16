@@ -64,52 +64,51 @@ int main(int argc, char** argv) {
     cap.grab();
 
     Mat frame, left_raw, left_rect, right_raw, right_rect, left_mono, right_mono;
-    int frequence = 20;
-    nh.getParam("/zed_cam_node/frequence", frequence);
-    ros::Rate r(frequence);
     cv_bridge::CvImage img_bridge;
     sensor_msgs::Image img_msg;
+    int count=0;
     while (ros::ok()) {
         // Get a new frame from camera
         cap >> frame;
-        // Extract left and right images from side-by-side
-        left_raw = frame(cv::Rect(0, 0, frame.cols / 2, frame.rows));
-        right_raw = frame(cv::Rect(frame.cols / 2, 0, frame.cols / 2, frame.rows));
 
-        std_msgs::Header header; // empty header
-        header.stamp = ros::Time::now(); // time
+        if (++count % 4 == 0)
+        {
+            // Extract left and right images from side-by-side
+            left_raw = frame(cv::Rect(0, 0, frame.cols / 2, frame.rows));
+            right_raw = frame(cv::Rect(frame.cols / 2, 0, frame.cols / 2, frame.rows));
 
-        /*
-        // left rgb raw
-        img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, left_raw);
-        img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-        pub_img_left.publish(img_msg); //
+            std_msgs::Header header;         // empty header
+            header.stamp = ros::Time::now(); // time
 
-        // right rgb raw
-        img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, right_raw);
-        img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-        pub_img_right.publish(img_msg); //
-        */
-       
-        // left mono raw
-        cv::cvtColor(left_raw, left_mono, cv::COLOR_BGR2GRAY);
-        img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO8, left_mono);
-        img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-        pub_img_left_mono_raw.publish(img_msg); //
+            /*
+            // left rgb raw
+            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, left_raw);
+            img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
+            pub_img_left.publish(img_msg); //
 
-        // right mono raw
-        cv::cvtColor(right_raw, right_mono, cv::COLOR_BGR2GRAY);
-        img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO8, right_mono);
-        img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-        pub_img_right_mono_raw.publish(img_msg); //
+            // right rgb raw
+            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, right_raw);
+            img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
+            pub_img_right.publish(img_msg); //
+            */
 
+            // left mono raw
+            cv::cvtColor(left_raw, left_mono, cv::COLOR_BGR2GRAY);
+            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO8, left_mono);
+            img_bridge.toImageMsg(img_msg);         // from cv_bridge to sensor_msgs::Image
+            pub_img_left_mono_raw.publish(img_msg); //
+
+            // right mono raw
+            cv::cvtColor(right_raw, right_mono, cv::COLOR_BGR2GRAY);
+            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::MONO8, right_mono);
+            img_bridge.toImageMsg(img_msg);          // from cv_bridge to sensor_msgs::Image
+            pub_img_right_mono_raw.publish(img_msg); //
+        }
         // imshow image
         //imshow("right RECT", right_rect);
         //imshow("left RECT", left_rect);
         //imshow("left Mono", left_mono);
         //waitKey(30);
-
-        r.sleep();
     }
     return 0;
 }
