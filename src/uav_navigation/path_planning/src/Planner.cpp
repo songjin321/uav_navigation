@@ -42,7 +42,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
     ob::RealVectorBounds bounds(3);
     bounds.setLow(0,-5); bounds.setHigh(0,5);
     bounds.setLow(1,-5); bounds.setHigh(1,5);
-    bounds.setLow(2, start_vec.z - 0.2); bounds.setHigh(2, start_vec.z + 0.2);
+    bounds.setLow(2, start_vec.z - 0.1); bounds.setHigh(2, start_vec.z + 0.1);
     space->as<ob::RealVectorStateSpace>()->setBounds(bounds);
 
     // start

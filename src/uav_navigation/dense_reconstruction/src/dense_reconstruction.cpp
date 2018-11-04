@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <ros/package.h>
+#include <rosbag/bag.h>
 
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
@@ -31,6 +32,8 @@ Rect validRoi[2];
 Size calib_img_size(672,376);
 Size out_img_size(600, 300);
 ros::Publisher point_cloud_pub;
+ros::Time captured_time;
+rosbag::Bag bag;
 
 void publishPointCloud(Mat& img_left, Mat& dmap)
 {
@@ -40,7 +43,7 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 	sensor_msgs::PointCloud2Ptr pc = boost::make_shared<sensor_msgs::PointCloud2>();
 
 	pc->header.frame_id = "camera";
-	pc->header.stamp = ros::Time::now();
+	pc->header.stamp = captured_time;
 	pc->width = calib_img_size.height;
 	pc->height = calib_img_size.width;
 	pc->is_bigendian = false;
@@ -91,6 +94,7 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 		}
 	}
 	point_cloud_pub.publish(*pc);
+	bag.write("/point_cloud", captured_time, *pc);	
 }
 
 /*
@@ -141,6 +145,9 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
 }
 
 void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::ImageConstPtr& msg_right) {
+
+	captured_time = msg_left->header.stamp;
+
 	// 转化ros image message到Mat
 	cv_bridge::CvImagePtr cv_ptr;
 	// left
@@ -175,8 +182,6 @@ void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::
 	Mat disparity_map;
 	if(generateDisparityMap(l_img_rectified, r_img_rectified, disparity_map));
 		publishPointCloud(img_left_color, disparity_map);
-
-	usleep(200);
 }
 
 int main(int argc, char** argv)
@@ -185,6 +190,11 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 	image_transport::ImageTransport it(nh);
 	point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>( "/point_cloud", 1);
+	// save point_cloud data to bag
+	std::string bag_file_path;
+	nh.param<std::string>("/dense_reconstruction/bag_file_path",bag_file_path,"~/Documents/pointclouds.bag");
+	bag.open(bag_file_path, rosbag::bagmode::Write);
+
 	// 读入标定参数
 	std::string rootdir = ros::package::getPath("dense_reconstruction");
 	std::string camera_config = rootdir + "/calibration_files/stereo_calibrate.yaml";
@@ -219,6 +229,6 @@ int main(int argc, char** argv)
 	message_filters::Synchronizer<SyncPolicy> sync(SyncPolicy(10), sub_img_left, sub_img_right);
 	sync.registerCallback(boost::bind(&imgCallback, _1, _2));
 	ros::spin();
-
+    bag.close();
 	return 0;
 }

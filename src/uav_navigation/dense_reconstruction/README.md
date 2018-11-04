@@ -11,10 +11,15 @@ dense_reconstruction`是求视差，并发布为点云形式
 roslaunch dense_reconstruction dense_reconstruction.launch
 ```
 
-##　订阅和发布topic
-订阅
-双目左眼　/camera/left/image_raw
-双目右眼  /camera/right/image_raw
+## 订阅和发布topic
 
-发布
-点云    /point_cloud
+- 订阅
+    - 双目左眼　/camera/left/image_raw
+    - 双目右眼  /camera/right/image_raw
+- 发布
+    - 点云  /point_cloud
+
+## Note
+1. The published point cloud is expressed in /camera coordinate
+2. write /point_cloud topic to bag file, the file path is set in launch file
+

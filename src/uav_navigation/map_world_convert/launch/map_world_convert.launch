@@ -1,0 +1,12 @@
+<launch>
+   	<node name="map_world_convert" pkg="map_world_convert" type="map_world_convert" output="screen">
+		<param name="vision_pose_map_name" value="/vision_pose_map/pose" type="string"/>
+		<param name="vision_pose_world_name" value="/vision_pose_world/pose" type="string"/>
+		<param name="yaw" value="-180" type="double"/>
+                <param name="pitch" value="0" type="double"/>
+                <param name="roll" value="-110" type="double"/>
+                <param name="x" value="0" type="double"/>
+                <param name="y" value="0" type="double"/>
+                <param name="z" value="0" type="double"/>
+	</node>
+</launch>

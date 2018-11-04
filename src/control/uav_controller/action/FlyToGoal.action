@@ -3,8 +3,6 @@
 geometry_msgs/PoseStamped goal_pose
 # determine which motion planner to use
 string fly_type
-# determine the step length of motion planner use
-float32 step_length
 # flying velocity
 float32 fly_vel
 ---

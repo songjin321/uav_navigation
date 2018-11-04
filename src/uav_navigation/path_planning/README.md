@@ -1,5 +1,5 @@
 
-##　安装
+## 安装
 
 - ompl
 
@@ -42,7 +42,7 @@ sudo  make install
 ros-kinetic-octomap
 版本1.8以上的，这个路径规划我把所有版本更新到最新，对应的ros版本是kinetic,使用`sudo apt-get install ros-kinetic-octomap ros-kinetic-octomap-mapping`
 
-##　使用
+## 使用
 
 ```bash
 rosrun path_planning path_planning_node
@@ -65,17 +65,27 @@ roslaunch pubTf.launch
 
 可以直接看终端会输出一系列的路径点，或者`rostopic echo /path_plan`，但是注意路径发布的是在`world`坐标系下，3D occupied map是在`map`坐标系下的,rviz不会同时显示两个topic，除非你自己提供一个从`map-->world`的坐标转换。
 
-接受一张地图和起始点和目标点，规划一条路径，都在世界坐标系下进行规划．
-应该提供的是一个服务
+## SJ Revised
 
-octoserver 发布的地图是显示在map坐标系下的
+This package provide a service that recieve a octomap, start_pose and goal_pose, then using rrt* algorithm to plan a path and make sure that each waypoint's pose is heading.
 
-planner_test, 接受rviz上的鼠标点击事件, 然后调用路径规划服务, 在地图上
-实时画出一条路径
+### Subscribed topic 
+
+| topic name | topic type | description |
+|------------|------------|---------|
+|"/octomap_binary" | geometry_msgs::PoseStamped | An octree map representing the enviroment around the uav 
+
+### Provided service
+
+| service name | service type | description |
+|------------|------------|---------|
+|"/planner_server" | nav_msgs::GetPlan | rrt* planning service
+
+### Note
+- All topic are represented in the map coordinate system 
+
+- In order to reduce the time taken to plan a path, please make sure that the starting point and the ending point are at the same height. **Only plan in the starting heigth+-0.1m space**
 
 
-rosrun octomap_server octomap_server_node /home/songjin/Project/uav_ws/src/uav_navigation/path_planning/data/grad.bt 
 
-全都在ｍａｐ坐标系下表示好了,路径也在ｍａｐ坐标系下表示
 
-路径规划在飞机平面＋－0.2m的高度上进行，不规划姿态．

@@ -20,7 +20,7 @@
       #- three
       #- SecondTracker
     </rosparam>
-    <remap from="/vrpn_client_node/sj/pose" to="/mavros/mocap/pose"/>
+    <remap from="/vrpn_client_node/sj/pose" to="/true_pose"/>
   </node>
 
 </launch>

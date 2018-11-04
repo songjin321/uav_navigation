@@ -1,3 +1,0 @@
-<launch>
-<node pkg="tf" type="static_transform_publisher" name="w_to_map" args="0 0 0 0 0 0  map world 40" />
-</launch>

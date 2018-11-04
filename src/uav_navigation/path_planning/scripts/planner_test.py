@@ -69,3 +69,6 @@ if __name__ == '__main__':
         path = get_path()
         rate.sleep()
 '''
+
+## planner_test, 接受rviz上的鼠标点击事件, 然后调用路径规划服务, 在地图上
+## 实时画出一条路径

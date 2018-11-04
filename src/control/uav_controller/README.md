@@ -13,13 +13,13 @@ uav_controller
 
 | 话题名称 | 话题类型 | 说明 |
 |------------|------------|---------|
-|"/vision_pose/pose" | geometry_msgs::PoseStamped | 视觉估计出来的，相机在地图坐标系的位姿
+|"/uav_pose_world/pose" | octomap_msgs::Octomap | the uav pose in world coordinate
 
 ### 发布的话题
 
 | 话题名称 | 话题类型 | 说明 |
 |------------|------------|---------|
-|"/mavros/vision_pose/pose" | geometry_msgs::PoseStamped | 发给px4飞控的,无人机在世界坐标系的位姿
+|"/mavros/mocap/pose" | geometry_msgs::PoseStamped | 发给px4飞控的,无人机在世界坐标系的位姿
 |"/mavros/setpoint_position/local" | geometry_msgs::PoseStamped | 控制飞机要运动到的位姿
 |"uav_controller_server/feedback" | geometry_msgs::PoseStamped | 无人机距离目标的距离
 |"uav_controller_server/result" | geometry_msgs::PoseStamped | 控制结束后无人机距离目标的距离
