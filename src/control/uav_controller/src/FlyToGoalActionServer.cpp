@@ -53,7 +53,7 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
         current_destination_pose = *ite_path;
 
         // call uav fly to goal method with correspond velocity
-        p_ros_uav_->fly_to_goal(current_destination_pose, goal->fly_vel);
+        p_ros_uav_->fly_to_goal(current_destination_pose);
 
         // publish the feedback
         current_pose = p_ros_uav_->getCurrentPoseStamped();

@@ -13,7 +13,7 @@ uav_controller
 
 | 话题名称 | 话题类型 | 说明 |
 |------------|------------|---------|
-|"/uav_pose_world/pose" | octomap_msgs::Octomap | the uav pose in world coordinate
+|"/uav_pose_world/pose" | geometry_msgs::PoseStamped | the uav pose in world coordinate
 
 ### 发布的话题
 
@@ -41,7 +41,7 @@ uav_controller
 
 1. 给定目标点的位姿
 2. 提供一个路径规划服务的名称
-3. 确定飞行速度(未实现)，当速度小于０时，进行位置控制（set_point）
+3. 进行位置控制（set_point）
 
 ### 注意点
 和目标点的距离小于0.03认为到达目标点，开始飞往下一个目标点

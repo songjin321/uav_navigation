@@ -18,7 +18,7 @@ public:
     RosWrapperUAV(std::string vision_pose_name);
     void vision_pose_callback(const geometry_msgs::PoseStamped &vision_pose);
     void uav_local_pose_callback(const geometry_msgs::PoseStamped &uav_local_pose);
-    void fly_to_goal(const geometry_msgs::PoseStamped &goal_pose, double fly_vel);
+    void fly_to_goal(const geometry_msgs::PoseStamped &goal_pose);
     geometry_msgs::PoseStamped getCurrentPoseStamped();
 private:
     ros::NodeHandle n_;

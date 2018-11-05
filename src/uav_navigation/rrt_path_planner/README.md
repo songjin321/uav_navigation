@@ -79,7 +79,7 @@ This package provide a service that recieve a octomap, start_pose and goal_pose,
 
 | service name | service type | description |
 |------------|------------|---------|
-|"/planner_server" | nav_msgs::GetPlan | rrt* planning service
+|"/rrt_planner_server" | nav_msgs::GetPlan | rrt* planning service
 
 ### Note
 - All topic are represented in the map coordinate system 

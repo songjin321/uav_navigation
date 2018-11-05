@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(path_planning)
+project(rrt_path_planner)
 set (CMAKE_CXX_STANDARD 11)
 ## Add support for C++11, supported in ROS Kinetic and newer
 # add_definitions(-std=c++11)
@@ -52,8 +52,8 @@ link_libraries(${OCTOMAP_LIBRARIES} ${fcl_LIBRARY_DIRS} ${OMPL_LIBRARY_DIRS})
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 
-add_executable(${PROJECT_NAME}_node src/path_planning.cpp src/Planner.cpp)
-target_link_libraries(${PROJECT_NAME}_node
+add_executable(rrt_planner_node src/rrt_planner.cpp src/Planner.cpp)
+target_link_libraries(rrt_planner_node
    ${catkin_LIBRARIES}
    ${OCTOMAP_LIBRARIES}
    ${OMPL_LIBRARIES}

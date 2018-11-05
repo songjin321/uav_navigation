@@ -1,9 +1,16 @@
 <launch>
-    <include file="$(find dense_reconstruction)/launch/dense_reconstruction.launch"/-->
-    <node name="path_planner_server" pkg="path_planning" type="path_planning_node" output="screen"/>
+    <include file="$(find dense_reconstruction)/launch/dense_reconstruction.launch"/>
+
+	<!-- rrt planner server /-->
+    <node name="path_planner_server" pkg="rrt_path_planner" type="rrt_planner" output="screen"/>
+
+	<!-- linear planner server /-->
+	<node name="linear_planner" pkg="linear_path_planner" type="linear_planner" output="screen"/>
+    
     <!--include file="$(find map_world_convert)/launch/map_world_convert.launch"/-->
     <include file="$(find dense_reconstruction)/launch/dense_reconstruction.launch"/-->
     <include file="$(find application)/launch/devices.launch"/-->
+
     <!-- octomap mapping /-->
     <node pkg="tf" type="static_transform_publisher" name="imu_to_camera" args="0 0 0 -1.57 0 -1.57  imu camera 40" />
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" output="screen">
@@ -22,4 +29,5 @@
 		<remap from="cloud_in" to="/point_cloud" />
 	</node> 
     <!-- octomap mapping /-->
+	
 </launch>

@@ -52,7 +52,7 @@ bool planCallback(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &
 }
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "path_planning_node");
+	ros::init(argc, argv, "rrt_planner_node");
 	ros::NodeHandle n;
     Planner path_planner;
 	ros::Subscriber octree_sub = n.subscribe<octomap_msgs::Octomap>

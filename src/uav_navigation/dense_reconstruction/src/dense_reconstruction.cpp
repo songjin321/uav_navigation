@@ -132,8 +132,8 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
 
     Mat disparity_show;
     leftdpf.convertTo(disparity_show, CV_32FC1, 1.f/disp_max);
-	imshow("disparity_show", disparity_show);
-	waitKey(1);
+	// imshow("disparity_show", disparity_show);
+	// waitKey(1);
 	// generator rectified image
     Mat rectified_image = cv::Mat(left.rows, 2*left.cols, left.type());
     left.copyTo(rectified_image(cv::Rect(0, 0, left.cols, left.rows)));

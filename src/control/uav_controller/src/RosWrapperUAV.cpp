@@ -73,7 +73,8 @@ void RosWrapperUAV::uav_local_pose_callback(const geometry_msgs::PoseStamped &ms
 geometry_msgs::PoseStamped RosWrapperUAV::getCurrentPoseStamped() {
     return uav_pose_;
 }
-void RosWrapperUAV::fly_to_goal(const geometry_msgs::PoseStamped &goal_pose, double fly_vel)
+
+void RosWrapperUAV::fly_to_goal(const geometry_msgs::PoseStamped &goal_pose)
 {
     if(!vision_pose_ok_flag)
     {
@@ -83,19 +84,5 @@ void RosWrapperUAV::fly_to_goal(const geometry_msgs::PoseStamped &goal_pose, dou
 	    mavros_attitute_pub_.publish(balance_pose);
         return;
     }
-    if (fly_vel <= 0)
-    {
-        mavros_position_pub_.publish(goal_pose);
-    } else {
-        // mavros,let uav fly to goal position using specific velocity.
-        double dx = goal_pose.pose.position.x - uav_pose_.pose.position.x;
-        double dy = goal_pose.pose.position.y - uav_pose_.pose.position.y;
-        double dz = goal_pose.pose.position.z - uav_pose_.pose.position.z;
-        double length = sqrt(dx * dx + dy * dy + dz * dz);
-        geometry_msgs::Twist uav_twist;
-        uav_twist.linear.x = dx/length * fly_vel;
-        uav_twist.linear.y = dy/length * fly_vel;
-        uav_twist.linear.z = dz/length * fly_vel;
-        mavros_velocity_pub_.publish(uav_twist);
-    }
+    mavros_position_pub_.publish(goal_pose);
 }

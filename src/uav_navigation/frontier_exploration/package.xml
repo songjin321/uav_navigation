@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package format="2">
+  <name>frontier_exploration</name>
+  <version>0.0.0</version>
+  <description>
+    The frontier-based exploration package
+  </description>
+  <maintainer email="songjinxs@163.com">songjin321</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>OpenCV</depend>
+  <depend>roscpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+
+</package>
