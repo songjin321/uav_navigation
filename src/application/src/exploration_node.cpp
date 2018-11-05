@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     // 初始化控制
     main_controller.init();
 
-    // begining exploration
+    // exploration
     main_controller.exploration();
 
     // 返回到起始点,降落到地面,关闭飞机

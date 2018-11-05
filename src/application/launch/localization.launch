@@ -5,12 +5,6 @@
  	<!-- uav controller launch file -->
     <node name="uav_controller_server_node" pkg="uav_controller" type="uav_controller_server" output="screen"/>
 
-	<!-- stereo dense reconstruction /-->
-    <include file="$(find dense_reconstruction)/launch/dense_reconstruction.launch"/>
-
-	<!-- frontier_based exploration algorithm-->
-	<node name="frontier_exploration_node" pkg="frontier_exploration" type="frontier_exploration_node" output="screen"/>
-
 	<!-- rrt planner server /-->
     <node name="rrt_planner_server" pkg="rrt_path_planner" type="rrt_planner_node" output="screen"/>
 
@@ -18,8 +12,7 @@
 	<node name="linear_planner_server" pkg="linear_path_planner" type="linear_planner_node" output="screen"/>
 
     <!-- octomap mapping /-->
-    <node pkg="tf" type="static_transform_publisher" name="imu_to_camera" args="0 0 0 -1.57 0 -1.57  imu camera 40" />
-	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" output="screen">
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" args="" output="screen">
 		<param name="frame_id" value="/map"/>
 		<param name="resolution" value="0.08" />
 		<param name="latch" value="false"/>
@@ -32,9 +25,8 @@
 		<param name="filter_ground" value="false" /> 
         <param name="occupancy_min_z" value="0.0" />
         <param name="occupancy_max_z" value="0.8" />
-		<remap from="cloud_in" to="/point_cloud" />
 	</node>
 	
 	<!-- exploration node -->
-	<!--node name="exploration_node" pkg="application" type="exploration_node" output="screen"/-->
+	<node name="localization_node" pkg="application" type="localization_node" output="screen"/>
 </launch>

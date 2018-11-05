@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
         // Get a new frame from camera
         cap >> frame;
 
-        if (++count % 4 == 0)
+        if (++count % 5 == 0)
         {
             // Extract left and right images from side-by-side
             left_raw = frame(cv::Rect(0, 0, frame.cols / 2, frame.rows));

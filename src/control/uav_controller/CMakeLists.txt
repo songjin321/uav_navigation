@@ -144,7 +144,7 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_server src/uav_controller_server.cpp)
-add_executable(test_uav_controller test/test_uav_controller.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -163,9 +163,7 @@ target_link_libraries(${PROJECT_NAME}_server
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
         )
-target_link_libraries(test_uav_controller
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME})
+
 #############
 ## Install ##
 #############
@@ -181,7 +179,7 @@ target_link_libraries(test_uav_controller
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_server test_uav_controller
+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_server 
         #ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

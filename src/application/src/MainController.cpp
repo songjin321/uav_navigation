@@ -31,11 +31,14 @@ MainController::MainController(std::string uav_controller_server_name) :
 }
 
 void MainController::ros_message_callback(int callback_rate) {
-    // object pose subscribe
-    ros::Subscriber object_pose_sub = nh_.subscribe("/rviz_target_pose", 1, &MainController::rviz_target_pose_callback, this);
+      // localization goal pose
+    ros::Subscriber object_pose_sub = nh_.subscribe("/move_base_simple/goal", 1, &MainController::rviz_target_pose_callback, this);
 
     // uav pose subscribe
     ros::Subscriber uav_pose_sub = nh_.subscribe("/mavros/local_position/pose", 1, &MainController::uav_pose_callback, this);
+
+    // exploration goal pose
+    ros::Subscriber exploration_pose_sub = nh_.subscribe("/exploration_goalpose", 1, &MainController::exploration_pose_callback, this); 
 
     ros::Rate loop_rate(callback_rate);
     while (ros::ok()) {
@@ -72,14 +75,6 @@ void MainController::returnToOrigin() {
 
     // close uav
     shutDownUav();
-}
-
-void MainController::rviz_target_pose_callback(const geometry_msgs::PoseStamped &msg) {
-    target_pose = msg;
-}
-
-void MainController::uav_pose_callback(const geometry_msgs::PoseStamped &msg) {
-    uav_pose = msg;
 }
 
 void MainController::shutDownUav() {
@@ -134,4 +129,19 @@ void MainController::flyInPlane(double x, double y, double step_length, double p
         // std::cout << "stable count = " << stable_count << std::endl;
     }
     ROS_INFO("arrive at goal plane point, the position of uav:x = %.3f, y = %.3f, z = %.3f", uav_pose.pose.position.x, uav_pose.pose.position.y, uav_pose.pose.position.z);
+}
+
+void MainController::exploration()
+{
+    flyFixedHeight(0.8);
+
+    while(exploration_goal_pose.pose.position.z > 0)
+        flyInPlane(exploration_goal_pose.pose.position.x, exploration_goal_pose.pose.position.y);  
+}
+
+void MainController::localization()
+{
+    flyFixedHeight(0.8);
+
+    flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y);
 }

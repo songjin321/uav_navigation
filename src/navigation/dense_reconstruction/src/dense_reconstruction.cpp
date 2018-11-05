@@ -120,7 +120,7 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
 	vector<Eigen::Vector3d> tri = elas.process(left.data, right.data, leftdpf.ptr<float>(0), rightdpf.ptr<float>(0), dims);
     chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
     chrono::duration<double> time_span = chrono::duration_cast<chrono::duration<double> >(t2 - t1);
-    cout <<  "genereate disparity image take time : " << time_span.count() << " seconds" << endl;
+    // cout <<  "genereate disparity image take time : " << time_span.count() << " seconds" << endl;
 
     disparity_map = leftdpf;
 
@@ -138,7 +138,7 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
     Mat rectified_image = cv::Mat(left.rows, 2*left.cols, left.type());
     left.copyTo(rectified_image(cv::Rect(0, 0, left.cols, left.rows)));
     right.copyTo(rectified_image(cv::Rect(left.cols, 0, left.cols, left.rows)));
-	std::cout << "left size = " << left.size() << std::endl;
+	// std::cout << "left size = " << left.size() << std::endl;
 	// imshow("rectified image", rectified_image);
 
 	return true;
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
 	point_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>( "/point_cloud", 1);
 	// save point_cloud data to bag
 	std::string bag_file_path;
-	nh.param<std::string>("/dense_reconstruction/bag_file_path",bag_file_path,"~/Documents/pointclouds.bag");
+	nh.param<std::string>("/dense_reconstruction_node/bag_file_path",bag_file_path,"~/Documents/pointclouds.bag");
 	bag.open(bag_file_path, rosbag::bagmode::Write);
 
 	// 读入标定参数

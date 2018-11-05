@@ -15,7 +15,7 @@
 
 class MainController
 {
-public:
+  public:
     MainController(std::string uav_controller_server_name);
 
     void init();
@@ -33,7 +33,7 @@ public:
     /*
      * 让飞机在平面进行平移,维持目标高度不变
      */
-    void flyInPlane(double x, double y, double step_length=0.1, double precision = 0.1);
+    void flyInPlane(double x, double y, double step_length = 0.1, double precision = 0.1);
 
     /*
      * 关闭飞机
@@ -41,29 +41,45 @@ public:
     void shutDownUav();
 
     /*
-    * let uav exploration in unknow enviroment 
+    * Stage1: let uav exploration in unknow enviroment 
     */
-    void exploration()
-    {
-    }
+    void exploration();
+
+    /*
+    * Stage3: use optimized map to localiztion 
+    */  
+    void localization();
 
     void ros_message_callback(int callback_rate);
-    
+
     void uav_control_loop(int loop_rate);
     /*
     * Use rviz to set the target point
     */
-    void rviz_target_pose_callback(const geometry_msgs::PoseStamped &msg);
+    void rviz_target_pose_callback(const geometry_msgs::PoseStamped &msg)
+    {
+        rviz_target_pose = msg;
+    }
 
-    void uav_pose_callback(const geometry_msgs::PoseStamped &msg);
-private:
+    void uav_pose_callback(const geometry_msgs::PoseStamped &msg)
+    {
+        uav_pose = msg;
+    }
+
+    void exploration_pose_callback(const geometry_msgs::PoseStamped &msg)
+    {
+        exploration_goal_pose = msg;
+    }
+
+  private:
     ros::NodeHandle nh_;
     uav_controller::FlyToGoalGoal goal;
     // 通过修改goal_pose来控制飞机,可以实现相对运动
     actionlib::SimpleActionClient<uav_controller::FlyToGoalAction> ac;
     ros::ServiceClient arming_client;
-    geometry_msgs::PoseStamped target_pose;
+    geometry_msgs::PoseStamped rviz_target_pose;
     geometry_msgs::PoseStamped uav_pose;
+    geometry_msgs::PoseStamped exploration_goal_pose;
     std::thread t_message_callback;
     std::thread t_uav_control_loop;
 
@@ -71,6 +87,5 @@ private:
     double origin_pose_y;
     double origin_pose_z;
 };
-
 
 #endif //IYDC_TASKS_MAINCONTROLLER_H

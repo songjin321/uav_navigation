@@ -7,10 +7,10 @@
 #include <geometry_msgs/Twist.h>
 #include "ros_common/RosMath.h"
 #include <iostream>
-RosWrapperUAV::RosWrapperUAV(std::string vision_pose_name):
+RosWrapperUAV::RosWrapperUAV():
         vision_pose_ok_flag(true)
 {
-    vision_pose_sub_ = n_.subscribe(vision_pose_name, 1, &RosWrapperUAV::vision_pose_callback, this);
+    vision_pose_sub_ = n_.subscribe("/vision_pose/pose", 1, &RosWrapperUAV::vision_pose_callback, this);
     mavros_position_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/setpoint_position/local",1);
     mavros_attitute_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/setpoint_attitude/local",1);
     mavros_velocity_pub_ = n_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel_unstamped", 1);
@@ -28,7 +28,7 @@ void RosWrapperUAV::vision_pose_callback(const geometry_msgs::PoseStamped &visio
     // uav_pose:无人机在世界坐标系
     geometry_msgs::PoseStamped uav_pose = vision_pose;
     uav_pose.header.stamp = ros::Time::now();
-    uav_pose.header.frame_id = "world";
+    // uav_pose.header.frame_id = "world";
 
     // 如果orb定位lost,三个位置分量返回const
     //double vision_x = uav_pose.pose.position.x;

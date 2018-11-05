@@ -58,7 +58,20 @@ Clone the repository and catkin build:
 ### exploration
 
 ```
-sh ${PATH_UAV_NAVIGATION}/script/exploration.sh
+# terminal 1 
+source ~/Project/uav_navigation/devel/setup.bash
+roslaunch application exploration.launch
+
+# terminal 2 
+source ~/Project/maplab_ws/devel/setup.bash
+./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_live ~/Documents/maps
+
+# terminal 3 
+rosbag record -j -b 0 /cam0/image_raw /cam1/image_raw /imu0 /vrpn_pose -O ~/Documents/exploration.bag
+
+# terminal 4
+rviz
+
 ```
 
 ### off-line optimization

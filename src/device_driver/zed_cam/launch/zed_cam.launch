@@ -1,9 +1,6 @@
 <launch>
-        <!-- parameters -->
-    	<arg name="frequence" value="60"/>
  	<node pkg="zed_cam" type="zed_cam_node" name="zed_cam_node" output="screen">
- 	  <remap from="/zed/left/image_mono" to="/cam0/image_raw" />
-      	  <remap from="/zed/right/image_mono" to="/cam1/image_raw" />
-          <param name="frequence" value="$(arg frequence)"/>
+ 	    <remap from="/zed/left/image_mono" to="/cam0/image_raw" />
+    	<remap from="/zed/right/image_mono" to="/cam1/image_raw" />
 	</node>
 </launch>

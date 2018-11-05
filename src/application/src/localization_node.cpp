@@ -10,7 +10,7 @@ int main(int argc, char **argv)
     main_controller.init();
 
     // begining exploration
-    main_controller.exploration();
+    main_controller.localization();
 
     // 返回到起始点,降落到地面,关闭飞机
     main_controller.returnToOrigin();

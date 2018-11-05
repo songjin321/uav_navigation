@@ -1,17 +1,17 @@
 <launch>
     <arg name="fcu_url" default="/dev/px4:921600" />
 
-    <!-- uav controller launch file -->
-    <node name="uav_controller_server_node" pkg="uav_controller" type="uav_controller_server" output="screen"/>
-
     <!-- mavros launch file -->
-    <include file="$(find mavros)/launch/px4.launch">
+    <!--include file="$(find mavros)/launch/px4.launch">
         <arg name="fcu_url" value="$(arg fcu_url)" />
-    </include>
+    </include-->
 
     <!-- zed stereo camera launch file -->
     <include file="$(find zed_cam)/launch/zed_cam.launch"/>
 
     <!-- imu launch file -->
-    <include file="$(find ethzasl_xsens_driver)/launch/xsens_driver.launch"/>
+    <include file="$(find xsens_driver)/launch/xsens_driver.launch"/>
+
+    <!-- vrpn launch file-->
+    <include file="$(find vrpn_client_ros)/launch/sample.launch"/>
 </launch>
