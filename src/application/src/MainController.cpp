@@ -27,11 +27,11 @@ MainController::MainController(std::string uav_controller_server_name) :
     t_message_callback = std::thread(&MainController::ros_message_callback, this, 60);
 
     // control uav thread
-    t_uav_control_loop = std::thread(&MainController::uav_control_loop, this, 5);
+    t_uav_control_loop = std::thread(&MainController::uav_control_loop, this, 1);
 }
 
 void MainController::ros_message_callback(int callback_rate) {
-      // localization goal pose
+    // localization goal pose
     ros::Subscriber object_pose_sub = nh_.subscribe("/move_base_simple/goal", 1, &MainController::rviz_target_pose_callback, this);
 
     // uav pose subscribe
@@ -136,12 +136,12 @@ void MainController::exploration()
     flyFixedHeight(0.8);
 
     while(exploration_goal_pose.pose.position.z > 0)
-        flyInPlane(exploration_goal_pose.pose.position.x, exploration_goal_pose.pose.position.y);  
+        flyInPlane(exploration_goal_pose.pose.position.x, exploration_goal_pose.pose.position.y, 0.3);  
 }
 
 void MainController::localization()
 {
     flyFixedHeight(0.8);
 
-    flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y);
+    flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y, 0.3);
 }

@@ -27,11 +27,6 @@ public:
     void executeCB(const uav_controller::FlyToGoalGoalConstPtr &goal);
 
 private:
-    /*
-     * you can add other action class object below
-     * fly circle
-     * fly follow
-     */
     bool generatePath(const std::string &path_planner_name,
                       double step_length,
                       const geometry_msgs::PoseStamped &start_pose,
@@ -39,6 +34,7 @@ private:
                       nav_msgs::Path &path);
 
     RosWrapperUAV *p_ros_uav_;
+    ros::Publisher planned_path_pub_;
 };
 
 

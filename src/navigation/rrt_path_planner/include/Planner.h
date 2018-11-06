@@ -44,6 +44,9 @@ public:
 
     bool planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<Vec3>& v_path);
 
+    // rrt range
+    double step_length;
+
 private:
     bool isStateValid(const ob::State *state);
     ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si);

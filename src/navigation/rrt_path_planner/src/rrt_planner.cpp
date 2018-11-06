@@ -30,11 +30,13 @@ bool planCallback(nav_msgs::GetPlan::Request &req, nav_msgs::GetPlan::Response &
     goal.x = req.goal.pose.position.x;
     goal.y = req.goal.pose.position.y;
     goal.z = req.goal.pose.position.z;
-
+    planner_ptr->step_length = req.tolerance;
+    /*
     ROS_INFO("try to plan a path, \n"
              "start.x = %.3f start.y = %.3f start.z = %.3f\n"
              "goal.x = %.3f goal.y = %.3f goal.z = %.3f",
              start.x, start.y, start.z, goal.x, goal.y, goal.z);
+    */
     if(planner_ptr->planPath(start, goal, path))
     {
         res.plan.header.stamp = ros::Time::now();
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
 	ros::Subscriber octree_sub = n.subscribe<octomap_msgs::Octomap>
 	        ("/octomap_binary", 1, boost::bind(&octomapCallback, _1, &path_planner));
 	ros::ServiceServer service = n.advertiseService<nav_msgs::GetPlan::Request, nav_msgs::GetPlan::Response>
-            ("/planner_server", boost::bind(&planCallback, _1, _2, &path_planner));
+            ("/rrt_planner_server", boost::bind(&planCallback, _1, _2, &path_planner));
 	ros::spin();
 	return 0;
 }

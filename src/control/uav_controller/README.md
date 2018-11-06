@@ -23,6 +23,7 @@ uav_controller
 |"/mavros/setpoint_position/local" | geometry_msgs::PoseStamped | 控制飞机要运动到的位姿
 |"uav_controller_server/feedback" | geometry_msgs::PoseStamped | 无人机距离目标的距离
 |"uav_controller_server/result" | geometry_msgs::PoseStamped | 控制结束后无人机距离目标的距离
+|"/planned_path" | nav_msgs::Path | Real-time planned path
 
 
 ### 订阅的服务

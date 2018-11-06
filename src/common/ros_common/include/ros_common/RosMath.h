@@ -14,6 +14,7 @@ public:
     static double getYawFromPoseStamp(const geometry_msgs::PoseStamped &p);
     static void getRPYFromPoseStamp(const geometry_msgs::PoseStamped &p,
                                       double &roll, double &pitch, double &yaw);
+    static void setPoseStampYawAngle(geometry_msgs::PoseStamped &p, double yaw);
 };
 
 

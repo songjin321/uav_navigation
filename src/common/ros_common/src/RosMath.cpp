@@ -33,7 +33,15 @@ double RosMath::getYawFromPoseStamp(const geometry_msgs::PoseStamped &p)
     m.getRPY(roll, pitch, yaw);
     return  yaw;
 }
-
+void RosMath::setPoseStampYawAngle(geometry_msgs::PoseStamped &p, double yaw)
+{
+    tf::Quaternion q;
+    q = tf::createQuaternionFromRPY(0, 0, yaw);
+    p.pose.orientation.w = q[3];
+    p.pose.orientation.x = q[0];
+    p.pose.orientation.y = q[1];
+    p.pose.orientation.z = q[2];
+}
 void RosMath::getRPYFromPoseStamp(const geometry_msgs::PoseStamped &p,
                                   double &roll, double &pitch, double &yaw)
 {

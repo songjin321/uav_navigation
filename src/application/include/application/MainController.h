@@ -59,6 +59,8 @@ class MainController
     void rviz_target_pose_callback(const geometry_msgs::PoseStamped &msg)
     {
         rviz_target_pose = msg;
+        std::cout << " rviz_target_pose x = " << rviz_target_pose.pose.position.x 
+                  << " rviz_target_pose y = " << rviz_target_pose.pose.position.y << std::endl;
     }
 
     void uav_pose_callback(const geometry_msgs::PoseStamped &msg)

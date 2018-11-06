@@ -62,26 +62,60 @@ Clone the repository and catkin build:
 source ~/Project/uav_navigation/devel/setup.bash
 roslaunch application exploration.launch
 
-# terminal 2 
+# terminal 2 rovio in vio mode
 source ~/Project/maplab_ws/devel/setup.bash
 ./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_live ~/Documents/maps
 
-# terminal 3 
+# terminal 3 record data
 rosbag record -j -b 0 /cam0/image_raw /cam1/image_raw /imu0 /vrpn_pose -O ~/Documents/exploration.bag
 
-# terminal 4
-rviz
+octomap_saver ~/Documents/explorationMap.bt
+
+# terminal 4 rviz show
+rviz ~/Project/uav_navigation/src/application/config/expolration.rviz
 
 ```
 
 ### off-line optimization
 
 ```
-sh ${PATH_UAV_NAVIGATION}/script/exploration.sh
+# import point cloud resource
+source ~/Project/maplab_ws/devel/setup.bash
+rosrun resource_importer import_resources_w_camera_info.sh ~/Documents/maps ~/Documents/pointclouds.bag /point_cloud ~/Documents/zed.yaml ~/Documents/maps_pc
+
+# optimize the map and save refined point cloud to file
+rosrun maplab_console maplab_console
+load --map_folder ~/Documents/maps_pc
+rtl
+optvi
+lc
+optvi
+save --map_folder ~/Documents/maps_opt
+create_octomap
+
+# use octomap_server creat new map
+source ~/Project/uav_navigation/devel/setup.bash
+rosbag play ~/Documents/
+roslaunch rviz-show octomapping.launch
+octomap_saver ~/Documents/optimizedMap.bt
 ```
 
 ### relocalization demo
 
 ```
-sh ${PATH_UAV_NAVIGATION}/script/exploration.sh
+# terminal 1 
+source ~/Project/uav_navigation/devel/setup.bash
+roslaunch application localization.launch
+
+# terminal 2 rovio in localization mode
+source ~/Project/maplab_ws/devel/setup.bash
+./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_localization
+~/Documents/maps_opt ~/Documents/maps_loc
+
+# terminal 3 record data
+rosbag record -j -b 0 /cam0/image_raw /cam1/image_raw /imu0 /vrpn_pose -O ~/Documents/localization.bag
+
+# terminal 4 rviz show
+rviz ~/Project/uav_navigation/src/application/config/localization.rviz
+
 ```

@@ -5,6 +5,7 @@
 #include "uav_controller/FlyToGoalActionServer.h"
 #include "ros_common/RosMath.h"
 #include <thread>
+#include "nav_msgs/Path.h"
 
 FlyToGoalActionServer::FlyToGoalActionServer(std::string name, RosWrapperUAV *ros_uav) :
         as_(nh_, name, boost::bind(&FlyToGoalActionServer::executeCB, this, _1), false),
@@ -12,6 +13,7 @@ FlyToGoalActionServer::FlyToGoalActionServer(std::string name, RosWrapperUAV *ro
         p_ros_uav_(ros_uav)
 {
     as_.start();
+    planned_path_pub_ = nh_.advertise<nav_msgs::Path>("/planned_path", 1);
 }
 
 void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPtr &goal)
@@ -92,18 +94,31 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
     srv.request.start = start_pose;
     srv.request.goal = goal_pose;
     srv.request.tolerance = step_length;
+    geometry_msgs::PoseStamped last_pose = start_pose;
     if(planner_client_.call(srv))
     {
         for(auto pose : srv.response.plan.poses)
         {
+            // when we plan the path in the plane, let the head of the uav forward 
+            if (path_planner_name == "rrt_planner_server")
+            {
+                double delta_x = pose.pose.position.x - last_pose.pose.position.x;
+                double delta_y = pose.pose.position.y - last_pose.pose.position.y;
+                double yaw = atan2(delta_y, delta_x);
+                RosMath::setPoseStampYawAngle(pose, yaw);
+                last_pose = pose;
+            }
+
             double yaw = RosMath::getYawFromPoseStamp(pose);
             ROS_INFO("get path success, x = %.3f, y = %.3f, z = %.3f, yaw = %.3f",
                      pose.pose.position.x,
                      pose.pose.position.y,
                      pose.pose.position.z,
-                     yaw*180/3.14);
+                     yaw*180/3.14);     
         }
         path = srv.response.plan;
+        path.header.frame_id = "map";
+        planned_path_pub_.publish(path);
         return true;
     }
     else

@@ -28,7 +28,7 @@ Planner::Planner() {
     // si->setStateValidityChecker(isStateValid);
     si->setStateValidityChecker(std::bind(&Planner::isStateValid, this, std::placeholders::_1));
 
-    std::cout << "Initialized: " << std::endl;
+    std::cout << "rrt planner initialized OK!" << std::endl;
 }
 
 void Planner::updateMap(std::shared_ptr<const octomap::OcTree> octomap)
@@ -61,7 +61,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
     pdef = ob::ProblemDefinitionPtr(new ob::ProblemDefinition(si));
 
     // set the start and goal states
-    pdef->setStartAndGoalStates(start, goal, 0.05);
+    pdef->setStartAndGoalStates(start, goal, 0.1);
 
     // set Optimizattion objective
     pdef->setOptimizationObjective(Planner::getThresholdPathLengthObj(si));
@@ -69,7 +69,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
     //设置rrt的参数range
     auto rrt = new og::InformedRRTstar(si);
     rrt->setGoalBias(0.05);
-    rrt->setRange(0.3);
+    rrt->setRange(step_length);
 
     // create a planner for the defined space
     planner = ob::PlannerPtr(rrt);
@@ -81,17 +81,17 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
     planner->setup();
 
     // print the problem settings
-    std::cout << std::endl;
-    pdef->print(std::cout);
-    std::cout << std::endl;
+    // std::cout << std::endl;
+    // pdef->print(std::cout);
+    // std::cout << std::endl;
 
     // print the settings for this space
-    si->printSettings(std::cout);
+    // si->printSettings(std::cout);
 
     auto t1 = Clock::now();
     ob::PlannerStatus solved = planner->solve(5);
     auto t2 = Clock::now();
-    std::cout << "time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
+    std::cout << "solved a rrt path cost time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
 
     if (solved)
     {
@@ -102,15 +102,13 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
         auto t1 = Clock::now();
         pathSimplifier->smoothBSpline(*path_smooth, 2);
         auto t2 = Clock::now();
-        std::cout << "time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
-
-        std::cout << "Smoothed Path OK" << std::endl;
+        std::cout << "smooth a rrt path cost time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
 
         v_path.clear();
         v_path.reserve(path_smooth->getStateCount());
 
         // print the path to screen
-        pdef->getSolutionPath()->print(std::cout);
+        // pdef->getSolutionPath()->print(std::cout);
 
         for (std::size_t path_idx = 0; path_idx < path_smooth->getStateCount(); path_idx++){
 
