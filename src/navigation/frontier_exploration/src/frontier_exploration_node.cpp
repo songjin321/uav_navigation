@@ -4,14 +4,17 @@
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/PoseStamped.h"
 #include <limits>
+#include "frontier_exploration/GetFrontiers.h"
+nav_msgs::OccupancyGrid map_occupancy;
 
-geometry_msgs::Pose uav_current_pose;
-geometry_msgs::PoseStamped uav_goal_pose;
-ros::Publisher exploration_pose_pub;
-
-void map_callback(const nav_msgs::OccupancyGrid &map_occupancy)
+void map_callback(const nav_msgs::OccupancyGrid &map_occupancy_)
 {
-    // std::cout << "begin callback!" << std::endl;
+    map_occupancy = map_occupancy_;
+    return;
+}
+bool generate_frotiers(frontier_exploration::GetFrontiers::Request &req,
+                       frontier_exploration::GetFrontiers::Response &res)
+{
     // store the map in cv::Mat, assign 255 to the frontier
     // occupancy map x->down, y->right
     // cv::Mat x->right, y->down
@@ -19,7 +22,7 @@ void map_callback(const nav_msgs::OccupancyGrid &map_occupancy)
     if (map.rows < 3 || map.cols < 3)
     {
         std::cout << "projected map is too small!" << std::endl;
-        return;
+        return false;
     }
     for (int j = 1; j < map.rows - 1; j++)
     {
@@ -34,28 +37,26 @@ void map_callback(const nav_msgs::OccupancyGrid &map_occupancy)
                 data[i] = 255;
         }
     }
-    std::cerr << "convert projected map to cv::Mat Ok!" << std::endl;
+    std::cout << "convert projected map to cv::Mat Ok!" << std::endl;
+    // cv::imshow("map", map);
+    // cv::waitKey(1);
 
     // Get the center of the closest connectable area
     cv::Mat frontiers, stats, centroids;
     int num_frontiers = cv::connectedComponentsWithStats(map, frontiers, stats, centroids);
     if (num_frontiers == 1)
     {
-        std::cout << "Map exploration completed, uav will return to the origin " << std::endl;
-        
-        // let goal position.z < 0, means that the environment has been explored
-        uav_goal_pose.pose.position.z = -1.0;
-        return;
+        // std::cout << "Map exploration completed" << std::endl;
+        return true;
     }
     // 0 is the label of background
     // assume the orientation of map is [1 0 0 0 ]
-    std::vector<geometry_msgs::Point> frontiers_center;
-    double min_distance = std::numeric_limits<double>::max();
+
     for (int i = 1; i < num_frontiers; i++)
     {
         int area_size = stats.at<int>(i, cv::CC_STAT_AREA);
         std::cout << "the area size of components " << i << " = " << area_size << std::endl;
-        if ( area_size < 15)
+        if ( area_size < req.min_area_size)
         {
             continue;
         }
@@ -67,41 +68,18 @@ void map_callback(const nav_msgs::OccupancyGrid &map_occupancy)
 
         center.z = 0.0;
 
-        double distance = std::sqrt((center.x - uav_current_pose.position.x) * (center.x - uav_current_pose.position.x)
-         + (center.y - uav_current_pose.position.y) * (center.y - uav_current_pose.position.y));
-
-        if (distance < min_distance)
-        {
-            min_distance = distance;
-            uav_goal_pose.header.frame_id = "map";
-            uav_goal_pose.pose.position.x = center.x;
-            uav_goal_pose.pose.position.y = center.y;
-            uav_goal_pose.pose.position.z = uav_current_pose.position.z;
-        }
-        frontiers_center.push_back(center);
+        res.frontier_points.push_back(center);
     }
-    std::cout << "the number of qualified frontiers is " << frontiers_center.size() << std::endl;
+    return true;
+}
 
-    // publish the exploration result
-    exploration_pose_pub.publish(uav_goal_pose);
-    
-    // cv::imshow("map", map);
-    // cv::waitKey(1);
-    return;
-}
-void uav_pose_callback(const geometry_msgs::PoseStamped &msg)
-{
-    uav_current_pose = msg.pose;
-}
 // let robot explore enviorment with frontier-based method
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "frontier_exploration_node");
     ros::NodeHandle nh;
     ros::Subscriber sub = nh.subscribe("/projected_map", 1, map_callback);
-    // uav pose subscribe
-    ros::Subscriber uav_pose_sub = nh.subscribe("/mavros/local_position/pose", 1, uav_pose_callback);
-    exploration_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/exploration_pose", 1);
+    ros::ServiceServer service = nh.advertiseService("/frontiers_server", generate_frotiers);
     ros::spin();
     return 0;
 }

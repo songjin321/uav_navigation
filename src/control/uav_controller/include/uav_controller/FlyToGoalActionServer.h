@@ -10,7 +10,7 @@
 #include "uav_controller/FlyToGoalAction.h"
 #include "RosWrapperUAV.h"
 #include "nav_msgs/Path.h"
-
+#include <thread>
 /*
  *  provide a action server, let uav fly to a goal point.
  */
@@ -35,6 +35,7 @@ private:
 
     RosWrapperUAV *p_ros_uav_;
     ros::Publisher planned_path_pub_;
+    std::thread t_path_planning_loop;
 };
 
 

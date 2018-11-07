@@ -7,13 +7,11 @@
 #include <thread>
 #include "nav_msgs/Path.h"
 
-FlyToGoalActionServer::FlyToGoalActionServer(std::string name, RosWrapperUAV *ros_uav) :
-        as_(nh_, name, boost::bind(&FlyToGoalActionServer::executeCB, this, _1), false),
-        action_name_(name),
-        p_ros_uav_(ros_uav)
+FlyToGoalActionServer::FlyToGoalActionServer(std::string name, RosWrapperUAV *ros_uav) : as_(nh_, name, boost::bind(&FlyToGoalActionServer::executeCB, this, _1), false),
+                                                                                         action_name_(name),
+                                                                                         p_ros_uav_(ros_uav)
 {
     as_.start();
-    planned_path_pub_ = nh_.advertise<nav_msgs::Path>("/planned_path", 1);
 }
 
 void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPtr &goal)
@@ -21,61 +19,70 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
     nav_msgs::Path path;
     geometry_msgs::PoseStamped current_pose = p_ros_uav_->getCurrentPoseStamped();
     geometry_msgs::PoseStamped current_destination_pose;
-    if (!generatePath(goal->fly_type,
-                      goal->step_length,
-                      current_pose,
-                      goal->goal_pose,
-                      path))
-    {
-        ROS_ERROR("plan path error!");
-        return;
-    }
-
-
-    bool success = true;
     // publish info to the console for the user
     ROS_INFO("%s: Executing, the goal position x = %f, y = %f, z = %f, yaw = %f",
              action_name_.c_str(), goal->goal_pose.pose.position.x,
              goal->goal_pose.pose.position.y,
              goal->goal_pose.pose.position.z,
-             RosMath::getYawFromPoseStamp(goal->goal_pose)*180/3.14);
+             RosMath::getYawFromPoseStamp(goal->goal_pose) * 180 / 3.14);
 
-    auto ite_path = path.poses.begin();
-
-    while (ite_path!=path.poses.end()) {
-        ros::Rate rate(20);
-        // check that preempt has not been requested by the client
-        if (as_.isPreemptRequested() || !ros::ok()) {
-            ROS_INFO("%s: Preempted", action_name_.c_str());
-            // set the action state to preempted
-            as_.setPreempted();
-            success = false;
-            break;
-        }
-        current_destination_pose = *ite_path;
-
-        // call uav fly to goal method with correspond velocity
-        p_ros_uav_->fly_to_goal(current_destination_pose);
-
-        // publish the feedback
-        current_pose = p_ros_uav_->getCurrentPoseStamped();
-        feedback_.distance = (float)RosMath::calDistance(current_pose, goal->goal_pose);
-        as_.publishFeedback(feedback_);
-
-        double current_yaw = RosMath::getYawFromPoseStamp(current_pose);
-        double current_destination_yaw = RosMath::getYawFromPoseStamp(current_destination_pose);
-	// std::cout << "z = " << current_pose.pose.position.z << std::endl;
-        if (RosMath::calDistance(current_destination_pose, current_pose) < 0.01)
- //              fabs(current_yaw - current_destination_yaw) < 30.0/180.0*3.14 )
+    //        
+    bool success = false;
+    while (!success)
+    {
+        if (!generatePath(goal->fly_type,
+                          goal->step_length,
+                          current_pose,
+                          goal->goal_pose,
+                          path))
         {
-            ite_path++;
-            ROS_INFO("arrive a waypoint");
+            ROS_ERROR("plan path error!");
+            result_.is_reachable = false;
+            as_.setAborted(result_);
+            return;
         }
-        rate.sleep();
+        auto ite_path = path.poses.begin();
+        int time_count = 0; 
+        ros::Rate rate(20);
+        while (ite_path != path.poses.end() && time_count < 60)
+        {
+            // check that preempt has not been requested by the client
+            if (as_.isPreemptRequested() || !ros::ok())
+            {
+                ROS_INFO("%s: Preempted", action_name_.c_str());
+                // set the action state to preempted
+                as_.setPreempted(result_);
+                success = false;
+                break;
+            }
+
+            current_destination_pose = *ite_path;
+            // call uav fly to goal method with correspond velocity
+            p_ros_uav_->fly_to_goal(current_destination_pose);
+
+            // publish the feedback
+            current_pose = p_ros_uav_->getCurrentPoseStamped();
+            feedback_.distance = (float)RosMath::calDistance(current_pose, goal->goal_pose);
+            as_.publishFeedback(feedback_);
+            // distance:0.1m  angle:30
+            double current_yaw = RosMath::getYawFromPoseStamp(current_pose);
+            double current_destination_yaw = RosMath::getYawFromPoseStamp(current_destination_pose);
+            if (RosMath::calDistance(current_destination_pose, current_pose) < 0.1 && 
+               fabs(current_yaw - current_destination_yaw) < 30.0/180.0*3.14 )
+            {
+                   ite_path++;
+                   ROS_INFO("arrive a waypoint");
+            }
+            time_count++;
+            rate.sleep();
+        }
+        if (ite_path == path.poses.end())
+            success = true;
     }
-    if (success) {
+    if (success)
+    {
         current_pose = p_ros_uav_->getCurrentPoseStamped();
-        result_.final_distance = (float)RosMath::calDistance(current_pose, goal->goal_pose);
+        result_.is_reachable = true;
         ROS_INFO("%s: Succeeded", action_name_.c_str());
         // set the action state to succeeded
         as_.setSucceeded(result_);
@@ -89,17 +96,17 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
                                          nav_msgs::Path &path)
 {
     ros::ServiceClient planner_client_;
-    planner_client_  = nh_.serviceClient<nav_msgs::GetPlan>(path_planner_name);
+    planner_client_ = nh_.serviceClient<nav_msgs::GetPlan>(path_planner_name);
     nav_msgs::GetPlan srv;
     srv.request.start = start_pose;
     srv.request.goal = goal_pose;
     srv.request.tolerance = step_length;
     geometry_msgs::PoseStamped last_pose = start_pose;
-    if(planner_client_.call(srv))
+    if (planner_client_.call(srv))
     {
-        for(auto pose : srv.response.plan.poses)
+        for (auto pose : srv.response.plan.poses)
         {
-            // when we plan the path in the plane, let the head of the uav forward 
+            // when we plan the path in the plane, let the head of the uav forward
             if (path_planner_name == "rrt_planner_server")
             {
                 double delta_x = pose.pose.position.x - last_pose.pose.position.x;
@@ -114,7 +121,7 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
                      pose.pose.position.x,
                      pose.pose.position.y,
                      pose.pose.position.z,
-                     yaw*180/3.14);     
+                     yaw * 180 / 3.14);
         }
         path = srv.response.plan;
         path.header.frame_id = "map";
@@ -126,5 +133,4 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
         ROS_ERROR("Failed to call path planner service");
         return false;
     }
-
 }

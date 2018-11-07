@@ -22,7 +22,7 @@ uav_controller
 |"/mavros/mocap/pose" | geometry_msgs::PoseStamped | 发给px4飞控的,无人机在世界坐标系的位姿
 |"/mavros/setpoint_position/local" | geometry_msgs::PoseStamped | 控制飞机要运动到的位姿
 |"uav_controller_server/feedback" | geometry_msgs::PoseStamped | 无人机距离目标的距离
-|"uav_controller_server/result" | geometry_msgs::PoseStamped | 控制结束后无人机距离目标的距离
+|"uav_controller_server/result" | bool | Is the goal reachable?
 |"/planned_path" | nav_msgs::Path | Real-time planned path
 
 

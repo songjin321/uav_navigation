@@ -4,10 +4,14 @@
 
 | topic name | topic type | description |
 |------------|------------|---------|
-|"/projected_map" | geometry_msgs::PoseStamped | An 3-D octree map is projected to 2D plane
+|"/projected_map" | geometry_msgs::PoseStamped | An 2D occupancy map is created by projecting a 3-D octree map to 2-d plane
 
-### Published topic 
+### Provided service
 
-| topic name | topic type | description |
+| service name | service type | description |
 |------------|------------|---------|
-|"/exploration_goalpose" | geometry_msgs::PoseStamped | the next exploration goal pose
+|"/frontiers_server" | fron::GetPlan | calculate frontiers service
+
+### Note
+
+Provide a service, input the minimum boundary area size, and return all the boundary area centers that meet the requirements

@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
         actionlib
         ros_common
         uav_controller
+        frontier_exploration
         )
 
 ## System dependencies are found with CMake's conventions
