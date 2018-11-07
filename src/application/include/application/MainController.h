@@ -84,7 +84,6 @@ class MainController
     geometry_msgs::PoseStamped uav_pose;
     geometry_msgs::PoseStamped exploration_goal_pose;
     std::thread t_message_callback;
-    std::thread t_uav_control_loop;
 
     double origin_pose_x;
     double origin_pose_y;

@@ -63,10 +63,10 @@ private:
     // create a specific planner
     ob::PlannerPtr planner;
 
-    bool replan_flag = false;
-
     std::shared_ptr<fcl::CollisionGeometryf> quadcopter_object;
     std::shared_ptr<fcl::CollisionGeometryf> map_object;
+
+    double planned_height = 0;
 };
 
 

@@ -120,6 +120,7 @@ bool MainController::flyInPlane(double x, double y, double step_length) {
 void MainController::exploration()
 {
     flyFixedHeight(0.8);
+
     bool is_exploration_finished = false;
     while(!is_exploration_finished)
     {
@@ -170,5 +171,8 @@ void MainController::localization()
 {
     flyFixedHeight(0.8);
 
-    flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y, 0.3);
+    while(!flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y, 0.3))
+    {
+        ROS_ERROR("The goal point is unreachable, please specify a suitable goal point!");
+    }
 }

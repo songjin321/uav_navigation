@@ -12,6 +12,7 @@ FlyToGoalActionServer::FlyToGoalActionServer(std::string name, RosWrapperUAV *ro
                                                                                          p_ros_uav_(ros_uav)
 {
     as_.start();
+    planned_path_pub_ = nh_.advertise<nav_msgs::Path>("/planned_path", 1);
 }
 
 void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPtr &goal)
@@ -30,6 +31,7 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
     bool success = false;
     while (!success)
     {
+        ROS_INFO("try to plan a new path");
         if (!generatePath(goal->fly_type,
                           goal->step_length,
                           current_pose,
@@ -44,7 +46,7 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
         auto ite_path = path.poses.begin();
         int time_count = 0; 
         ros::Rate rate(20);
-        while (ite_path != path.poses.end() && time_count < 60)
+        while (ite_path != path.poses.end() && time_count < 100)
         {
             // check that preempt has not been requested by the client
             if (as_.isPreemptRequested() || !ros::ok())
@@ -55,15 +57,16 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
                 success = false;
                 break;
             }
-
+            current_pose = p_ros_uav_->getCurrentPoseStamped();
             current_destination_pose = *ite_path;
             // call uav fly to goal method with correspond velocity
             p_ros_uav_->fly_to_goal(current_destination_pose);
 
             // publish the feedback
-            current_pose = p_ros_uav_->getCurrentPoseStamped();
+            /*
             feedback_.distance = (float)RosMath::calDistance(current_pose, goal->goal_pose);
             as_.publishFeedback(feedback_);
+            */
             // distance:0.1m  angle:30
             double current_yaw = RosMath::getYawFromPoseStamp(current_pose);
             double current_destination_yaw = RosMath::getYawFromPoseStamp(current_destination_pose);

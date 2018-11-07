@@ -35,7 +35,6 @@ private:
 
     RosWrapperUAV *p_ros_uav_;
     ros::Publisher planned_path_pub_;
-    std::thread t_path_planning_loop;
 };
 
 

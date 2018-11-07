@@ -7,6 +7,7 @@
 #include <ompl/geometric/PathSimplifier.h>
 #include "functional"
 #include <chrono>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 
 typedef std::chrono::high_resolution_clock Clock;
 
@@ -19,7 +20,7 @@ Planner::Planner() {
     map_object = std::shared_ptr<fcl::CollisionGeometryf>(tree);
 
     //解的状态空间
-    space = ob::StateSpacePtr(new ob::RealVectorStateSpace(3));
+    space = ob::StateSpacePtr(new ob::RealVectorStateSpace(2));
 
     // construct an instance of  space information from this state space
     si = ob::SpaceInformationPtr(new ob::SpaceInformation(space));
@@ -39,36 +40,37 @@ void Planner::updateMap(std::shared_ptr<const octomap::OcTree> octomap)
 bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<Vec3>& v_path)
 {
     // 搜索的三维范围设置
-    ob::RealVectorBounds bounds(3);
+    ob::RealVectorBounds bounds(2);
     bounds.setLow(0,-5); bounds.setHigh(0,5);
     bounds.setLow(1,-5); bounds.setHigh(1,5);
-    bounds.setLow(2, start_vec.z - 0.1); bounds.setHigh(2, start_vec.z + 0.1);
+    // bounds.setLow(2, start_vec.z - 0.1); bounds.setHigh(2, start_vec.z + 0.1);
     space->as<ob::RealVectorStateSpace>()->setBounds(bounds);
 
     // start
     ob::ScopedState<ob::RealVectorStateSpace> start(space);
     start->values[0] = start_vec.x;
     start->values[1] = start_vec.y;
-    start->values[2] = start_vec.z;
+    planned_height = start_vec.z;
+    // start->values[2] = start_vec.z;
 
     // goal
     ob::ScopedState<ob::RealVectorStateSpace> goal(space);
     goal->values[0] = goal_vec.x;
     goal->values[1] = goal_vec.y;
-    goal->values[2] = goal_vec.z;
+    // goal->values[2] = goal_vec.z;
 
     // create a problem instance
     pdef = ob::ProblemDefinitionPtr(new ob::ProblemDefinition(si));
 
     // set the start and goal states
-    pdef->setStartAndGoalStates(start, goal, 0.1);
+    pdef->setStartAndGoalStates(start, goal);
 
     // set Optimizattion objective
     pdef->setOptimizationObjective(Planner::getThresholdPathLengthObj(si));
 
     //设置rrt的参数range
     auto rrt = new og::InformedRRTstar(si);
-    rrt->setGoalBias(0.05);
+    // rrt->setGoalBias(0.05);
     rrt->setRange(step_length);
 
     // create a planner for the defined space
@@ -89,18 +91,18 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
     // si->printSettings(std::cout);
 
     auto t1 = Clock::now();
-    ob::PlannerStatus solved = planner->solve(5);
+    ob::PlannerStatus solved = planner->solve(3);
     auto t2 = Clock::now();
     std::cout << "solved a rrt path cost time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
 
-    if (solved)
+    if (solved == ob::PlannerStatus::EXACT_SOLUTION)
     {
         //B样条曲线优化,并且保证优化后的路径和地图不碰撞
         auto pathSimplifier = new og::PathSimplifier(si);
         auto path_smooth = new og::PathGeometric(dynamic_cast<const og::PathGeometric&>(*pdef->getSolutionPath()));
 
         auto t1 = Clock::now();
-        pathSimplifier->smoothBSpline(*path_smooth, 2);
+        pathSimplifier->smoothBSpline(*path_smooth);
         auto t2 = Clock::now();
         std::cout << "smooth a rrt path cost time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
 
@@ -116,7 +118,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
             Vec3 path_point;
             path_point.x = pos->values[0];
             path_point.y = pos->values[1];
-            path_point.z = pos->values[2];
+            path_point.z = planned_height;
             v_path.push_back(path_point);
         }
 
@@ -133,7 +135,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
 
 bool Planner::isStateValid(const ob::State *state)
 {
-    // auto t1 = Clock::now();
+    auto t1 = Clock::now();
     // cast the abstract state type to the type we expect
     const auto pos = state->as<ob::RealVectorStateSpace::StateType>();
 
@@ -147,15 +149,15 @@ bool Planner::isStateValid(const ob::State *state)
     fcl::CollisionObjectf quadcopter_collision(quadcopter_object);
 
     // check validity of state defined by pos & rot
-    Eigen::Vector3f translation(pos->values[0],pos->values[1], pos->values[2]);
+    Eigen::Vector3f translation(pos->values[0],pos->values[1], planned_height);
     Eigen::Quaternionf rotation(1, 0, 0, 0);
     quadcopter_collision.setTransform(rotation, translation);
     fcl::CollisionRequestf requestType(1,false,1,false);
     fcl::CollisionResultf collisionResult;
     fcl::collide<float>(&quadcopter_collision, &map_collision, requestType, collisionResult);
 
-    // auto t2 = Clock::now();
-    // std::cout << "time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
+    auto t2 = Clock::now();
+    // std::cout << "valid a state cost time: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " miliseconds" << std::endl;
 
     //return (const void*)rot != (const void*)pos;
     return(!collisionResult.isCollision());
@@ -164,6 +166,6 @@ bool Planner::isStateValid(const ob::State *state)
 ob::OptimizationObjectivePtr Planner::getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {
     ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-    obj->setCostThreshold(ob::Cost(100));
+    // obj->setCostThreshold(ob::Cost(100));
     return obj;
 }

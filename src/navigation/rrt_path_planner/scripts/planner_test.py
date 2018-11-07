@@ -37,10 +37,10 @@ def callback_goal(data):
     path = get_path()
 
 def get_path():
-    rospy.wait_for_service('planner_server')
+    rospy.wait_for_service('/rrt_planner_server')
     try:
         print "try to plan a path"
-        plan_path = rospy.ServiceProxy('planner_server', GetPlan)
+        plan_path = rospy.ServiceProxy('/rrt_planner_server', GetPlan)
         resp = plan_path(start, goal, 1)
         resp.plan.header.frame_id = "map"
         path_pub.publish(resp.plan)
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     goal_pub = rospy.Publisher("goal/clicked_point", PointStamped, queue_size=1)
 
-    path_pub = rospy.Publisher('/path', Path, queue_size=1)
+    path_pub = rospy.Publisher('/planned_path', Path, queue_size=1)
     rospy.spin()
 '''
     rate = rospy.Rate(0.2)
@@ -69,6 +69,3 @@ if __name__ == '__main__':
         path = get_path()
         rate.sleep()
 '''
-
-## planner_test, 接受rviz上的鼠标点击事件, 然后调用路径规划服务, 在地图上
-## 实时画出一条路径
