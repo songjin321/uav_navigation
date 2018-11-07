@@ -80,6 +80,7 @@ class MainController
     actionlib::SimpleActionClient<uav_controller::FlyToGoalAction> ac;
     ros::ServiceClient arming_client;
     ros::ServiceClient frontiers_client;
+    ros::Publisher exploration_pose_pub;
     geometry_msgs::PoseStamped rviz_target_pose;
     geometry_msgs::PoseStamped uav_pose;
     geometry_msgs::PoseStamped exploration_goal_pose;

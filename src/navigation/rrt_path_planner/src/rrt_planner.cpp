@@ -14,7 +14,7 @@ void octomapCallback(const octomap_msgs::OctomapConstPtr msg, Planner* planner_p
         // Update the octree used for collision checking
         std::shared_ptr<const octomap::OcTree> smart_tree_oct(tree_oct);
         planner_ptr->updateMap(smart_tree_oct);
-        ROS_INFO("map updated!");
+        // ROS_INFO("map updated!");
     }else {
         std::cout << "from base convert to derived failed!" << std::endl;
         delete tree_oct;

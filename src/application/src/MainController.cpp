@@ -28,6 +28,9 @@ MainController::MainController(std::string uav_controller_server_name) :
     // frontiers client
     frontiers_client = nh_.serviceClient<frontier_exploration::GetFrontiers>("/frontiers_server");
 
+    // exploration goal pose
+    exploration_pose_pub = nh_.advertise<geometry_msgs::PoseStamped>("/exploration_pose", 1);
+
     // ros message callback, 60HZ
     t_message_callback = std::thread(&MainController::ros_message_callback, this, 60);
 }
@@ -38,9 +41,6 @@ void MainController::ros_message_callback(int callback_rate) {
 
     // uav pose subscribe
     ros::Subscriber uav_pose_sub = nh_.subscribe("/mavros/local_position/pose", 1, &MainController::uav_pose_callback, this);
-
-    // exploration goal pose
-    ros::Subscriber exploration_pose_sub = nh_.subscribe("/exploration_goalpose", 1, &MainController::exploration_pose_callback, this); 
 
     ros::Rate loop_rate(callback_rate);
     while (ros::ok()) {
@@ -125,7 +125,7 @@ void MainController::exploration()
     while(!is_exploration_finished)
     {
         frontier_exploration::GetFrontiers srv;
-        srv.request.min_area_size = 30;     
+        srv.request.min_area_size = 15;     
         if (frontiers_client.call(srv))
         {
             if (srv.response.frontier_points.size() == 0)
@@ -148,16 +148,19 @@ void MainController::exploration()
                                       + (b.y - uav_pose.pose.position.y) * (b.y - uav_pose.pose.position.y));
                     return distance_a < distance_b;
                 });
+                is_exploration_finished = true;
                 for (auto center : frontier_points)
                 {
+                    geometry_msgs::PoseStamped exploration_goal_pose;
+                    exploration_goal_pose.header.frame_id = "map";
+                    exploration_goal_pose.pose.position.x = center.x;
+                    exploration_goal_pose.pose.position.y = center.y;
+                    exploration_pose_pub.publish(exploration_goal_pose);
                     if (flyInPlane(center.x, center.y, 0.3))
                     {
+                        is_exploration_finished = false;
                         break;
-                    } else
-                    {
-                        continue;
-                    }
-                    ROS_INFO("exploration finished!");  
+                    } 
                 }
             }
         }else
@@ -165,6 +168,7 @@ void MainController::exploration()
             ROS_ERROR("Failed to call frontier service!");
         }
     }
+    ROS_INFO("exploration finished!");  
 }
 
 void MainController::localization()

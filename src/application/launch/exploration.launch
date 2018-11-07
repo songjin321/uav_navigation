@@ -35,5 +35,5 @@
 	</node>
 	
 	<!-- exploration node -->
-	<!--node name="exploration_node" pkg="application" type="exploration_node" output="screen"/-->
+	<node name="exploration_node" pkg="application" type="exploration_node" output="screen"/>
 </launch>
