@@ -21,11 +21,10 @@
     <node pkg="tf" type="static_transform_publisher" name="imu_to_camera" args="0 0 0 -1.57 0 -1.57  imu camera 40" />
 	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" output="screen">
 		<param name="frame_id" value="/map"/>
-		<param name="resolution" value="0.08" />
+		<param name="resolution" value="0.09" />
 		<param name="latch" value="false"/>
-		<param name="pointcloud_max_z" value="4.5" />
-		<param name="pointcloud_min_z" value="-0.2" />
-		<param name="occupancy_max_z" value="2.5" /> 
+		<param name="pointcloud_max_z" value="3.5" />
+		<param name="pointcloud_min_z" value="0.2" />
 		<param name="sensor_model/max_range" value="4.0" /> 
 		<param name="sensor_model/hit" value="0.64" /> 
 		<param name="sensor_model/max" value="0.97" /> 

@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     // Set the video resolution (2*Width * Height)
     cap.set(CV_CAP_PROP_FRAME_WIDTH, image_size.width * 2);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, image_size.height);
-    cap.set(CAP_PROP_FPS, 120);
+    cap.set(CAP_PROP_FPS, 60);
     cap.grab();
 
     Mat frame, left_raw, left_rect, right_raw, right_rect, left_mono, right_mono;
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
         // Get a new frame from camera
         cap >> frame;
 
-        if (++count % 5 == 0)
+        if (++count % 3 == 0)
         {
             // Extract left and right images from side-by-side
             left_raw = frame(cv::Rect(0, 0, frame.cols / 2, frame.rows));
@@ -79,18 +79,6 @@ int main(int argc, char** argv) {
 
             std_msgs::Header header;         // empty header
             header.stamp = ros::Time::now(); // time
-
-            /*
-            // left rgb raw
-            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, left_raw);
-            img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-            pub_img_left.publish(img_msg); //
-
-            // right rgb raw
-            img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, right_raw);
-            img_bridge.toImageMsg(img_msg); // from cv_bridge to sensor_msgs::Image
-            pub_img_right.publish(img_msg); //
-            */
 
             // left mono raw
             cv::cvtColor(left_raw, left_mono, cv::COLOR_BGR2GRAY);
@@ -104,11 +92,6 @@ int main(int argc, char** argv) {
             img_bridge.toImageMsg(img_msg);          // from cv_bridge to sensor_msgs::Image
             pub_img_right_mono_raw.publish(img_msg); //
         }
-        // imshow image
-        //imshow("right RECT", right_rect);
-        //imshow("left RECT", left_rect);
-        //imshow("left Mono", left_mono);
-        //waitKey(30);
     }
     return 0;
 }

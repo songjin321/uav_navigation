@@ -119,7 +119,7 @@ bool MainController::flyInPlane(double x, double y, double step_length) {
 
 void MainController::exploration()
 {
-    flyFixedHeight(0.8);
+    flyFixedHeight(0.8, 0.3);
 
     bool is_exploration_finished = false;
     while(!is_exploration_finished)
@@ -169,7 +169,7 @@ void MainController::exploration()
 
 void MainController::localization()
 {
-    flyFixedHeight(0.8);
+    flyFixedHeight(0.8, 0.3);
 
     while(!flyInPlane(rviz_target_pose.pose.position.x, rviz_target_pose.pose.position.y, 0.3))
     {

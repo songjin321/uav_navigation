@@ -13,5 +13,5 @@
     <include file="$(find xsens_driver)/launch/xsens_driver.launch"/>
 
     <!-- vrpn launch file-->
-    <include file="$(find vrpn_client_ros)/launch/sample.launch"/>
+    <!--include file="$(find vrpn_client_ros)/launch/sample.launch"/-->
 </launch>

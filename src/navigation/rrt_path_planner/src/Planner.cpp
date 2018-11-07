@@ -97,7 +97,7 @@ bool Planner::planPath(const Vec3& start_vec, const Vec3& goal_vec, std::vector<
 
     if (solved == ob::PlannerStatus::EXACT_SOLUTION)
     {
-        //B样条曲线优化,并且保证优化后的路径和地图不碰撞
+        //B样条曲线优化,并且保证优化后的路径和地图不碰撞`
         auto pathSimplifier = new og::PathSimplifier(si);
         auto path_smooth = new og::PathGeometric(dynamic_cast<const og::PathGeometric&>(*pdef->getSolutionPath()));
 
