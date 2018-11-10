@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>uav_test</name>
+  <version>0.0.0</version>
+  <description>The orb_slam package</description>
+
+  <maintainer email="songjinxs@163.com">song jin</maintainer>
+
+  <license>BSD</license>
+
+
+  <author email="songjinxs@163.com">song jin</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend> 
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>mavros_msgs</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+
+  <run_depend>geometry_msgs</run_depend>
+
+
+
+  <export>
+  </export>
+
+</package>

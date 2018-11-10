@@ -69,7 +69,7 @@ source ~/Project/maplab_ws/devel/setup.bash
 # terminal 3 record data
 rosbag record -j -b 0 /cam0/image_raw /cam1/image_raw /imu0 /vrpn_pose -O ~/Documents/exploration.bag
 
-octomap_saver ~/Documents/explorationMap.bt
+rosrun octomap_server octomap_saver ~/Documents/explorationMap.bt
 
 # terminal 4 rviz show
 rviz ~/Project/uav_navigation/src/application/config/expolration.rviz
@@ -79,25 +79,34 @@ rviz ~/Project/uav_navigation/src/application/config/expolration.rviz
 ### off-line optimization
 
 ```
+# replay expolration bag (optional)
+rosbag play ~/Documents/exploration.bag --clock
+roslaunch application run_bag.launch
+./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_live
+
 # import point cloud resource
 source ~/Project/maplab_ws/devel/setup.bash
-rosrun resource_importer import_resources_w_camera_info.sh ~/Documents/maps ~/Documents/pointclouds.bag /point_cloud ~/Documents/zed.yaml ~/Documents/maps_pc
+rosrun resource_importer import_resources_w_ncamera_yaml.sh ~/Documents/maps ~/Documents/pointclouds.bag /point_cloud ~/Documents/zed.yaml ~/Documents/maps
 
 # optimize the map and save refined point cloud to file
 rosrun maplab_console maplab_console
 load --map_folder ~/Documents/maps_pc
+v
 rtl
 optvi
 lc
 optvi
 save --map_folder ~/Documents/maps_opt
+**rosparam set /use_sim_time false**
 create_octomap
 
 # use octomap_server creat new map
+rosbag play ~/Documents/pointcloud_processed.bag
+
 source ~/Project/uav_navigation/devel/setup.bash
-rosbag play ~/Documents/
-roslaunch rviz-show octomapping.launch
-octomap_saver ~/Documents/optimizedMap.bt
+roslaunch application run_bag.launch
+
+rosrun octomap_server octomap_saver ~/Documents/optimizedMap.bt
 ```
 
 ### relocalization demo
@@ -109,8 +118,7 @@ roslaunch application localization.launch
 
 # terminal 2 rovio in localization mode
 source ~/Project/maplab_ws/devel/setup.bash
-./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_localization
-~/Documents/maps_opt ~/Documents/maps_loc
+./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_localization ~/Documents/maps_localization ~/Documents/maps_loc
 
 # terminal 3 record data
 rosbag record -j -b 0 /cam0/image_raw /cam1/image_raw /imu0 /vrpn_pose -O ~/Documents/localization.bag

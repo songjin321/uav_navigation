@@ -55,13 +55,18 @@ int main(int argc, char** argv) {
     ////////////////////////////////////
     VideoCapture cap(0);
     if (!cap.isOpened())
+    {
+        std::cerr << "can not open zed camera!" << std::endl;
         return -1;
+    }
+
     cap.grab();
     // Set the video resolution (2*Width * Height)
     cap.set(CV_CAP_PROP_FRAME_WIDTH, image_size.width * 2);
     cap.set(CV_CAP_PROP_FRAME_HEIGHT, image_size.height);
     cap.set(CAP_PROP_FPS, 60);
-    cap.grab();
+    std::cout << "frames = " << cap.get(CAP_PROP_FPS) << std::endl;
+    cap.grab(); 
 
     Mat frame, left_raw, left_rect, right_raw, right_rect, left_mono, right_mono;
     cv_bridge::CvImage img_bridge;
@@ -93,5 +98,6 @@ int main(int argc, char** argv) {
             pub_img_right_mono_raw.publish(img_msg); //
         }
     }
+    cap.release();
     return 0;
 }

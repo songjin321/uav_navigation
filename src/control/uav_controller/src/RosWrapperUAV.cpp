@@ -15,7 +15,7 @@ RosWrapperUAV::RosWrapperUAV():
     mavros_attitute_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/setpoint_attitude/local",1);
     mavros_velocity_pub_ = n_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel_unstamped", 1);
     mavros_vision_pose_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/mocap/pose",1);
-    uav_local_pose_sub_ = n_.subscribe("/mavros/local_position/pose",1, &RosWrapperUAV::uav_local_pose_callback, this);
+    uav_local_pose_sub_ = n_.subscribe("/mavros/mocap/pose",1, &RosWrapperUAV::uav_local_pose_callback, this);
     uav_pose_pub_.pose.orientation.w = 1.0;
 }
 

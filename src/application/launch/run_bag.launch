@@ -1,9 +1,13 @@
 <launch>
+	<!-- stereo dense reconstruction /-->
+    <include file="$(find dense_reconstruction)/launch/dense_reconstruction.launch"/>
+
     <!-- octomap mapping /-->
-	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" args="$(env HOME)/Documents/optimizedMap.bt" output="screen">
+    <node pkg="tf" type="static_transform_publisher" name="imu_to_camera" args="0 0 0 -1.57 0 -1.57  imu camera 40" />
+	<node pkg="octomap_server" type="octomap_server_node" name="octomap_server_node" output="screen">
 		<param name="frame_id" value="/map"/>
 		<param name="resolution" value="0.09" />
-		<param name="latch" value="true"/>
+		<param name="latch" value="false"/>
 		<param name="pointcloud_max_z" value="1.0" />
 		<param name="pointcloud_min_z" value="0.6" />
 		<param name="sensor_model/max_range" value="4.0" /> 
@@ -12,6 +16,7 @@
 		<param name="filter_ground" value="false" /> 
         <param name="occupancy_min_z" value="0.6" />
         <param name="occupancy_max_z" value="1.0" />
+		<remap from="cloud_in" to="/point_cloud" />
 	</node>
+	<param name ="/use_sim_time" value="true"/>
 </launch>
-

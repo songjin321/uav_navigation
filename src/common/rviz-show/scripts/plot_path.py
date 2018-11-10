@@ -25,6 +25,7 @@ def callback_ts(ts):
     br.sendTransformMessage(ts)
 
     # publish static tf 
+    """
     static_transformStamped = TransformStamped()
   
     static_transformStamped.header.stamp = ts.header.stamp
@@ -41,14 +42,14 @@ def callback_ts(ts):
     static_transformStamped.transform.rotation.z = quat[2]
     static_transformStamped.transform.rotation.w = quat[3]
     br.sendTransformMessage(static_transformStamped)
-
+    """
     print "publish a path and transform"
 
 if __name__ == '__main__':
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("/sensor_pose", TransformStamped, callback_ts)
+    rospy.Subscriber("/map_camera_pose", TransformStamped, callback_ts)
 
-    path_pub = rospy.Publisher('/sensor_path', Path, queue_size=1)
+    path_pub = rospy.Publisher('/camera_path', Path, queue_size=1)
 
     rospy.spin()

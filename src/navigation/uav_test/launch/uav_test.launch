@@ -1,0 +1,12 @@
+<launch>
+    <include file="$(find mavros)/launch/px4.launch">
+        <arg name="fcu_url" value="/dev/px4:921600" />
+    </include>
+    <include file="$(find vrpn_client_ros)/launch/sample.launch"/>
+    <node name="uav_test" pkg="uav_test" type="test_fix_point" output="screen">
+            <param name="set_point_x" value="0" type="double"/>
+            <param name="set_point_y" value="0" type="double"/>
+            <param name="set_point_z" value="0.5" type="double"/>
+    </node>
+</launch>
+

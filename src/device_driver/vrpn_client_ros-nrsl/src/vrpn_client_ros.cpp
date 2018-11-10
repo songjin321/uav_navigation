@@ -116,26 +116,26 @@ namespace vrpn_client_ros {
                 tracker->pose_msg_.header.stamp = ros::Time::now();
             }
 
-            //x point to me
-            tracker->pose_msg_.pose.position.x = -tracker_pose.pos[0];
-            tracker->pose_msg_.pose.position.y = tracker_pose.pos[2];
-            tracker->pose_msg_.pose.position.z = tracker_pose.pos[1];
-            tracker->pose_msg_.pose.orientation.x = -tracker_pose.quat[0];
-            tracker->pose_msg_.pose.orientation.y = tracker_pose.quat[2];
-            tracker->pose_msg_.pose.orientation.z = tracker_pose.quat[1];
-            tracker->pose_msg_.pose.orientation.w = tracker_pose.quat[3];
-
-            //x point to right
+            //The orignal x point to the head of uav
             /*
-            tracker->pose_msg_.pose.position.x = -tracker_pose.pos[2];
-            tracker->pose_msg_.pose.position.y = -tracker_pose.pos[0];
+            tracker->pose_msg_.pose.position.x = tracker_pose.pos[0];
+            tracker->pose_msg_.pose.position.y = -tracker_pose.pos[2];
             tracker->pose_msg_.pose.position.z = tracker_pose.pos[1];
-
-            tracker->pose_msg_.pose.orientation.x = -tracker_pose.quat[2];
-            tracker->pose_msg_.pose.orientation.y = -tracker_pose.quat[0];
+            tracker->pose_msg_.pose.orientation.x = tracker_pose.quat[0];
+            tracker->pose_msg_.pose.orientation.y = -tracker_pose.quat[2];
             tracker->pose_msg_.pose.orientation.z = tracker_pose.quat[1];
             tracker->pose_msg_.pose.orientation.w = tracker_pose.quat[3];
             */
+
+            //The orignal x point to the left of uav
+            tracker->pose_msg_.pose.position.x = tracker_pose.pos[2];
+            tracker->pose_msg_.pose.position.y = tracker_pose.pos[0];
+            tracker->pose_msg_.pose.position.z = tracker_pose.pos[1];
+            tracker->pose_msg_.pose.orientation.x = tracker_pose.quat[2];
+            tracker->pose_msg_.pose.orientation.y = tracker_pose.quat[0];
+            tracker->pose_msg_.pose.orientation.z = tracker_pose.quat[1];
+            tracker->pose_msg_.pose.orientation.w = tracker_pose.quat[3];
+        
 
 
 

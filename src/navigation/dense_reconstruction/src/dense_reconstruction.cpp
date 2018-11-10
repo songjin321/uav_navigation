@@ -34,7 +34,7 @@ Size out_img_size(600, 300);
 ros::Publisher point_cloud_pub;
 ros::Time captured_time;
 rosbag::Bag bag;
-
+int count_num = 0;
 void publishPointCloud(Mat& img_left, Mat& dmap)
 {
 	Mat V = Mat(4, 1, CV_64FC1);
@@ -86,6 +86,8 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 			*iter_x = X;
 			*iter_y = Y;
 			*iter_z = Z;
+			if (Z < 1)
+				continue;
 			*iter_r = red;
 			*iter_g = green;
 			*iter_b = blue;
@@ -132,8 +134,8 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
 
     Mat disparity_show;
     leftdpf.convertTo(disparity_show, CV_32FC1, 1.f/disp_max);
-	// imshow("disparity_show", disparity_show);
-	// waitKey(1);
+	imshow("disparity_show", disparity_show);
+	waitKey(1);
 	// generator rectified image
     Mat rectified_image = cv::Mat(left.rows, 2*left.cols, left.type());
     left.copyTo(rectified_image(cv::Rect(0, 0, left.cols, left.rows)));
@@ -145,7 +147,8 @@ bool generateDisparityMap(Mat& left, Mat& right, Mat &disparity_map) {
 }
 
 void imgCallback(const sensor_msgs::ImageConstPtr& msg_left, const sensor_msgs::ImageConstPtr& msg_right) {
-
+	if (++count_num % 4 != 0)
+		return;
 	captured_time = msg_left->header.stamp;
 
 	// 转化ros image message到Mat
