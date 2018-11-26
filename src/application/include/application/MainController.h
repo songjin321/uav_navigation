@@ -33,7 +33,7 @@ class MainController
     /*
      * 让飞机在平面进行平移,维持目标高度不变
      */
-    bool flyInPlane(double x, double y, double step_length = 0.1);
+    bool flyInPlane(double x, double y, double step_length , bool *is_plan_failed=nullptr);
 
     /*
      * 关闭飞机

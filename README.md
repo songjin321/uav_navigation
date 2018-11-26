@@ -62,6 +62,10 @@ Clone the repository and catkin build:
 source ~/Project/uav_navigation/devel/setup.bash
 roslaunch application exploration.launch
 
+# terminal 1 
+source ~/Project/uav_navigation/devel/setup.bash
+roslaunch application mavros.launch
+
 # terminal 2 rovio in vio mode
 source ~/Project/maplab_ws/devel/setup.bash
 ./Project/maplab_ws/src/maplab/applications/rovioli/scripts/tutorials/huang_live ~/Documents/maps

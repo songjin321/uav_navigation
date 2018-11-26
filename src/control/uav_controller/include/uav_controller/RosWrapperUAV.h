@@ -8,6 +8,7 @@
 #include "nav_msgs/GetPlan.h"
 #include "uav_controller/RosWrapperUAV.h"
 #include <ros/ros.h>
+#include <thread>
 /*
  * 保存无人机的状态,利用mavros底层控制无人机运动
  * 利用glog,将飞行状态记录下来
@@ -20,6 +21,7 @@ public:
     void uav_local_pose_callback(const geometry_msgs::PoseStamped &uav_local_pose);
     void fly_to_goal(const geometry_msgs::PoseStamped &goal_pose);
     geometry_msgs::PoseStamped getCurrentPoseStamped();
+    void uav_control_loop(int loop_rate);
 private:
     ros::NodeHandle n_;
     ros::Subscriber vision_pose_sub_;
@@ -28,6 +30,7 @@ private:
     ros::Publisher mavros_vision_pose_pub_;
     ros::Publisher mavros_attitute_pub_;
     ros::Publisher mavros_velocity_pub_;
+    std::thread t_uav_control_loop;
     /*
      * 时刻发布出去的视觉估计的姿态
      */
@@ -37,6 +40,12 @@ private:
      * 从mavros返回回来的无人机的位姿
      */
     geometry_msgs::PoseStamped uav_pose_;
+
+    /*
+     * uav goal pose
+     */
+    geometry_msgs::PoseStamped goal_pose_;
+
     /*
      * true表示视觉的位姿可用, false表示不可用
      */

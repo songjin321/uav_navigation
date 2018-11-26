@@ -1,10 +1,4 @@
 <launch>
-    <arg name="fcu_url" default="/dev/px4:921600" />
-
-    <!-- mavros launch file -->
-    <!--include file="$(find mavros)/launch/px4.launch">
-        <arg name="fcu_url" value="$(arg fcu_url)" />
-    </include-->
 
     <!-- zed stereo camera launch file -->
     <include file="$(find zed_cam)/launch/zed_cam.launch"/>

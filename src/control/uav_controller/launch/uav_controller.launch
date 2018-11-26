@@ -1,5 +1,5 @@
 <launch>
  	<node pkg="uav_controller" type="uav_controller_server" name="uav_controller_server" output="screen">
- 	    <remap from="/vision_pose/pose" to="/maplab_rovio/T_M_I" />
+ 	    <remap from="/vision_pose/pose" to="/maplab_rovio/T_G_I" />
 	</node>
 </launch>

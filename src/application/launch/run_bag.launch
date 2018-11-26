@@ -8,8 +8,8 @@
 		<param name="frame_id" value="/map"/>
 		<param name="resolution" value="0.09" />
 		<param name="latch" value="false"/>
-		<param name="pointcloud_max_z" value="1.0" />
-		<param name="pointcloud_min_z" value="0.6" />
+		<param name="pointcloud_max_z" value="1.3" />
+		<param name="pointcloud_min_z" value="0.3" />
 		<param name="sensor_model/max_range" value="4.0" /> 
 		<param name="sensor_model/hit" value="0.64" /> 
 		<param name="sensor_model/max" value="0.97" /> 

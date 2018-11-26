@@ -48,7 +48,6 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 	pc->height = calib_img_size.width;
 	pc->is_bigendian = false;
 	pc->is_dense = false;
-
 	sensor_msgs::PointCloud2Modifier pc_modifier(*pc);
 	pc_modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
 
@@ -64,9 +63,9 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 		for (int j = 0; j < img_left.rows; j++) {
 			float d = dmap.at<float>(j, i);
 			// if low disparity, then ignore
-			if (d < 3.) {
-				continue;
-			}
+			// if (d < 3.) {
+			// 	continue;
+			// }
 			// V is the vector to be multiplied to Q to get
 			// the 3D homogenous coordinates of the image point
 			V.at<double>(0, 0) = (double) (i);
@@ -82,12 +81,14 @@ void publishPointCloud(Mat& img_left, Mat& dmap)
 			red = img_left.at < Vec3b > (j, i)[2];
 			green = img_left.at < Vec3b > (j, i)[1];
 			blue = img_left.at < Vec3b > (j, i)[0];
-
+			if ( Z < 0.5 || d < 3.)
+			{
+				Z = 100;
+			}
+			// fabs(X) < 0.5 || fabs(Y) < 0.5 || fabs(Z) < 0.5 ||
 			*iter_x = X;
 			*iter_y = Y;
 			*iter_z = Z;
-			if (Z < 1)
-				continue;
 			*iter_r = red;
 			*iter_g = green;
 			*iter_b = blue;

@@ -38,8 +38,8 @@ bool generate_frotiers(frontier_exploration::GetFrontiers::Request &req,
         }
     }
     std::cout << "convert projected map to cv::Mat Ok!" << std::endl;
-    // cv::imshow("map", map);
-    // cv::waitKey(1);
+    cv::imshow("map", map);
+    cv::waitKey(1);
 
     // Get the center of the closest connectable area
     cv::Mat frontiers, stats, centroids;
@@ -55,7 +55,7 @@ bool generate_frotiers(frontier_exploration::GetFrontiers::Request &req,
     for (int i = 1; i < num_frontiers; i++)
     {
         int area_size = stats.at<int>(i, cv::CC_STAT_AREA);
-        std::cout << "the area size of components " << i << " = " << area_size << std::endl;
+        // std::cout << "the area size of components " << i << " = " << area_size << std::endl;
         if ( area_size < req.min_area_size)
         {
             continue;

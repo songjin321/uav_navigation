@@ -31,7 +31,7 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
     bool success = false;
     while (!success)
     {
-        ROS_INFO("try to plan a new path");
+        geometry_msgs::PoseStamped current_pose = p_ros_uav_->getCurrentPoseStamped();
         if (!generatePath(goal->fly_type,
                           goal->step_length,
                           current_pose,
@@ -43,6 +43,10 @@ void FlyToGoalActionServer::executeCB(const uav_controller::FlyToGoalGoalConstPt
             as_.setAborted(result_);
             return;
         }
+        // for test
+        // success = true;
+        // break;
+        //
         auto ite_path = path.poses.begin();
         int time_count = 0; 
         ros::Rate rate(20);
@@ -107,6 +111,7 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
     geometry_msgs::PoseStamped last_pose = start_pose;
     if (planner_client_.call(srv))
     {
+        std::cout << "\n call planned service ok! \n" << std::endl;
         for (auto pose : srv.response.plan.poses)
         {
             // when we plan the path in the plane, let the head of the uav forward
@@ -120,11 +125,13 @@ bool FlyToGoalActionServer::generatePath(const std::string &path_planner_name,
             }
 
             double yaw = RosMath::getYawFromPoseStamp(pose);
+            /*
             ROS_INFO("get path success, x = %.3f, y = %.3f, z = %.3f, yaw = %.3f",
                      pose.pose.position.x,
                      pose.pose.position.y,
                      pose.pose.position.z,
                      yaw * 180 / 3.14);
+            */
         }
         path = srv.response.plan;
         path.header.frame_id = "map";

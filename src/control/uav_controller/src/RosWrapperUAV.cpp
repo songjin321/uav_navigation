@@ -15,8 +15,12 @@ RosWrapperUAV::RosWrapperUAV():
     mavros_attitute_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/setpoint_attitude/local",1);
     mavros_velocity_pub_ = n_.advertise<geometry_msgs::Twist>("/mavros/setpoint_velocity/cmd_vel_unstamped", 1);
     mavros_vision_pose_pub_ = n_.advertise<geometry_msgs::PoseStamped>("/mavros/mocap/pose",1);
+    //uav_local_pose_sub_ = n_.subscribe("/mavros/local_position/pose",1, &RosWrapperUAV::uav_local_pose_callback, this);
+    // for test
     uav_local_pose_sub_ = n_.subscribe("/mavros/mocap/pose",1, &RosWrapperUAV::uav_local_pose_callback, this);
     uav_pose_pub_.pose.orientation.w = 1.0;
+    // control uav thread
+    t_uav_control_loop = std::thread(&RosWrapperUAV::uav_control_loop, this, 20);
 }
 
 void RosWrapperUAV::vision_pose_callback(const geometry_msgs::PoseStamped &vision_pose)
@@ -69,7 +73,13 @@ void RosWrapperUAV::uav_local_pose_callback(const geometry_msgs::PoseStamped &ms
 {
     uav_pose_ = msg;
 }
-
+void RosWrapperUAV::uav_control_loop(int loop_rate) {
+    ros::Rate rate(loop_rate);
+    while (ros::ok()) {
+        mavros_position_pub_.publish(goal_pose_);
+        rate.sleep();
+    }
+}
 geometry_msgs::PoseStamped RosWrapperUAV::getCurrentPoseStamped() {
     return uav_pose_;
 }
@@ -84,5 +94,5 @@ void RosWrapperUAV::fly_to_goal(const geometry_msgs::PoseStamped &goal_pose)
 	    mavros_attitute_pub_.publish(balance_pose);
         return;
     }
-    mavros_position_pub_.publish(goal_pose);
+    goal_pose_ = goal_pose;
 }

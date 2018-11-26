@@ -15,3 +15,5 @@
 ### Note
 
 Provide a service, input the minimum boundary area size, and return all the boundary area centers that meet the requirements
+
+rviz x width 

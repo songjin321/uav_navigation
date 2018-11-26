@@ -98,7 +98,7 @@ bool MainController::flyFixedHeight(double z, double step_length) {
     return true;
 }
 
-bool MainController::flyInPlane(double x, double y, double step_length) {
+bool MainController::flyInPlane(double x, double y, double step_length, bool *is_plan_failed) {
     // 高度和姿态不变,做平面运动
     goal.goal_pose.pose.position.x = x;
     goal.goal_pose.pose.position.y = y;
@@ -107,10 +107,19 @@ bool MainController::flyInPlane(double x, double y, double step_length) {
     ac.sendGoal(goal);
     ROS_INFO("try to arrive at plane point x = %.3f, y = %.3f, z = %.3f, step_length = %.3f", 
     x, y, goal.goal_pose.pose.position.z,step_length);
-    ac.waitForResult();
+    //wait for the action to return
+    bool finished_before_timeout = ac.waitForResult(ros::Duration(5.0));
     const uav_controller::FlyToGoalResultConstPtr result = ac.getResult();
-    if (!result->is_reachable)
+    if (finished_before_timeout && !result->is_reachable)
     {
+        *is_plan_failed = true;
+        ROS_WARN("can not arrive at goal plane point due to planned path failed ");
+        return false;
+    }
+    if (!finished_before_timeout && !result->is_reachable)
+    {
+        *is_plan_failed = false;
+        ROS_WARN("can not arrive at goal plane point due to time restricted ");
         return false;
     }
     ROS_INFO("arrive at goal plane point, the position of uav:x = %.3f, y = %.3f, z = %.3f", uav_pose.pose.position.x, uav_pose.pose.position.y, uav_pose.pose.position.z);
@@ -119,15 +128,16 @@ bool MainController::flyInPlane(double x, double y, double step_length) {
 
 void MainController::exploration()
 {
-    flyFixedHeight(0.8, 0.3);
+    flyFixedHeight(0.3, 0.6);
 
     bool is_exploration_finished = false;
     while(!is_exploration_finished)
     {
         frontier_exploration::GetFrontiers srv;
-        srv.request.min_area_size = 15;     
+        srv.request.min_area_size = 15; 
         if (frontiers_client.call(srv))
         {
+            std::cout << "call frontiers service ok!" << std::endl;
             if (srv.response.frontier_points.size() == 0)
             {
                 is_exploration_finished = true;
@@ -156,17 +166,21 @@ void MainController::exploration()
                     exploration_goal_pose.pose.position.x = center.x;
                     exploration_goal_pose.pose.position.y = center.y;
                     exploration_pose_pub.publish(exploration_goal_pose);
-                    if (flyInPlane(center.x, center.y, 0.3))
+                    bool is_plan_failed;
+                    bool fly_ok = flyInPlane(center.x, center.y, 0.3, &is_plan_failed);
+                    if (is_plan_failed)
+                        continue;
+                    if (!fly_ok && !is_plan_failed)
                     {
                         is_exploration_finished = false;
                         break;
-                    } 
+                    }
                 }
             }
         }else
         {
             ROS_ERROR("Failed to call frontier service!");
-        }
+        } 
     }
     ROS_INFO("exploration finished!");  
 }
