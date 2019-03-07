@@ -16,7 +16,7 @@ This repository contains the code for UAV to implement autonomous navigation in 
 - Autonomous Navigation of MAVs in Unkonwn Environments With Onboard Stereo Camera [pdf]()
 
 ### videos
-<a href="https://www.youtube.com/watch?v=CR_JxXpjgnQ"> <img src="https://img.youtube.com/vi/CR_JxXpjgnQ/maxresdefault.jpg" alt="video" width="600"/>
+<a href="https://www.youtube.com/watch?v=0po_DdoPUlQ"> <img src="https://img.youtube.com/vi/0po_DdoPUlQ/maxresdefault.jpg" alt="video" width="600"/>
 </a>
 
 ## Installation
